@@ -1,0 +1,127 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+login.starbucks.co.jp
+
+Program:
+{
+  "handle": "starbucks_japan",
+  "name": "Starbucks Japan",
+  "date_launched": "2024-11-06",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/9i5ph93tuj3xbbsbui15gvmdtnny/74790fe75ac5dbe8a5140a122388d59ebac913dcfa941f0b3a45e6cad161f9ea",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/starbucks_japan",
+  "report_count": 42,
+  "last_updated": "2026-06-06T19:35:57Z",
+  "targets_updated_at": "2026-01-02T14:41:36Z",
+  "bounty_min": 150,
+  "bounty_max": 3000,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:starbucks_japan",
+  "added_at": "2024-11-06T00:00:00Z",
+  "extra_data": {
+    "report_count": 42,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "mobile"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 7,
+    "in_scope": 7,
+    "out_of_scope": 0,
+    "eligible_for_bounty": 7,
+    "wildcard": 0
+  },
+  "target_activity": {
+    "latest_change_at": "2026-04-22T18:53:57Z",
+    "latest_added_at": "2026-04-22T18:53:57Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from moderate public report count, mature program, generic web scope."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "login.starbucks.co.jp",
+  "display_name": "Domain",
+  "normalized_identifier": "login.starbucks.co.jp",
+  "in_scope": true,
+  "wildcard": false,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical"
+  },
+  "source_url": "https://hackerone.com/starbucks_japan/policy_scopes?type=team",
+  "added_at": "2026-01-02T14:29:48Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T19:35:57Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": "added",
+  "last_changed_at": "2026-04-22T18:53:57Z",
+  "is_active": true,
+  "targetOpportunityScore": 35,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 45.03
+    },
+    "targetType": {
+      "score": 14,
+      "label": "Web/domain",
+      "key": "domain"
+    },
+    "reward": {
+      "score": 14,
+      "label": "Good bounty",
+      "maxBounty": 3000,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 7,
+      "label": "Moderate public report count",
+      "reportCount": 42,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from moderate public report count, mature program, generic web scope.",
+  "whyThisTarget": "Older web/domain target, with eligible and in scope, strong reward potential, high competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: login.starbucks.co.jp
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

@@ -1,0 +1,127 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+cart.tw.coupang.com
+
+Program:
+{
+  "handle": "coupang_tw",
+  "name": "Coupang Taiwan",
+  "date_launched": "2026-05-06",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/ohz78auk3cauxip3saglty9bqrff/d9695107bfcd68eeb1c9e0912b109cdae9a6c00c0bda6fd4cbd6d9bdb828840a",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/coupang_tw",
+  "report_count": 764,
+  "last_updated": "2026-06-06T19:35:56Z",
+  "targets_updated_at": "2026-05-06T00:17:23Z",
+  "bounty_min": 50,
+  "bounty_max": 4000,
+  "up_votes": 1,
+  "down_votes": 1,
+  "id": "HackerOne:coupang_tw",
+  "added_at": "2026-05-06T00:00:00Z",
+  "extra_data": {
+    "report_count": 764,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "mobile"
+  ],
+  "total_votes": 2,
+  "vote_ratio": 0.5,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 1.0986122886681098,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 47,
+    "in_scope": 47,
+    "out_of_scope": 0,
+    "eligible_for_bounty": 47,
+    "wildcard": 0
+  },
+  "target_activity": {
+    "latest_change_at": null,
+    "latest_added_at": "2026-05-06T00:17:23Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "cart.tw.coupang.com",
+  "display_name": "Domain",
+  "normalized_identifier": "cart.tw.coupang.com",
+  "in_scope": true,
+  "wildcard": false,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical"
+  },
+  "source_url": "https://hackerone.com/coupang_tw/policy_scopes?type=team",
+  "added_at": "2026-05-06T00:17:23Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T19:35:56Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true,
+  "targetOpportunityScore": 28,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 31.81
+    },
+    "targetType": {
+      "score": 14,
+      "label": "Web/domain",
+      "key": "domain"
+    },
+    "reward": {
+      "score": 14,
+      "label": "Good bounty",
+      "maxBounty": 4000,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 0,
+      "label": "High public report count",
+      "reportCount": 764,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, web target.",
+  "whyThisTarget": "Older web/domain target, with eligible and in scope, strong reward potential, high competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: cart.tw.coupang.com
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

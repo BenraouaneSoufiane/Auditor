@@ -1,0 +1,132 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+https://*.blinkforhome.com/*
+
+Program:
+{
+  "handle": "ring",
+  "name": "Ring",
+  "date_launched": "2023-05-16",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/m2ln2frwv7yvghr2doz2tz19sfqe/3f1ab5c6a9b6dadada1e6c8121700b884388bd0a43471fee1897a38ce57d0b2c",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/ring",
+  "report_count": 186,
+  "last_updated": "2026-06-06T19:35:56Z",
+  "targets_updated_at": "2026-05-07T12:53:44Z",
+  "bounty_min": 500,
+  "bounty_max": 20000,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:ring",
+  "added_at": "2023-05-16T00:00:00Z",
+  "extra_data": {
+    "report_count": 186,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "wildcard",
+    "hardware",
+    "mobile",
+    "other"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 33,
+    "in_scope": 30,
+    "out_of_scope": 3,
+    "eligible_for_bounty": 30,
+    "wildcard": 2
+  },
+  "target_activity": {
+    "latest_change_at": null,
+    "latest_added_at": "2026-05-07T12:53:44Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, older program, less obvious asset type."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "https://*.blinkforhome.com/*",
+  "display_name": "Wildcard",
+  "normalized_identifier": "*.blinkforhome.com",
+  "in_scope": true,
+  "wildcard": true,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical",
+    "base_domain": "blinkforhome.com",
+    "display_name": "Wildcard"
+  },
+  "source_url": "https://hackerone.com/ring/policy_scopes?type=team",
+  "added_at": "2026-05-07T12:53:44Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T19:35:56Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true,
+  "targetOpportunityScore": 47,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 30.29
+    },
+    "targetType": {
+      "score": 22,
+      "label": "Wildcard",
+      "key": "wildcard"
+    },
+    "reward": {
+      "score": 25,
+      "label": "Very high bounty",
+      "maxBounty": 20000,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 0,
+      "label": "High public report count",
+      "reportCount": 186,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, older program, less obvious asset type.",
+  "whyThisTarget": "Wildcard target, with eligible and in scope, high bounty potential, high competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: https://*.blinkforhome.com/*
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

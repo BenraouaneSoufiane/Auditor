@@ -1,0 +1,131 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+*.grindr.com
+
+Program:
+{
+  "handle": "grindr",
+  "name": "Grindr",
+  "date_launched": "2023-02-23",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/X6YCAKGLQQQTmQX2cnLh1ofS/3f1ab5c6a9b6dadada1e6c8121700b884388bd0a43471fee1897a38ce57d0b2c",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/grindr",
+  "report_count": 27,
+  "last_updated": "2026-06-06T19:35:56Z",
+  "targets_updated_at": "2026-05-07T12:53:51Z",
+  "bounty_min": 100,
+  "bounty_max": 3000,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:grindr",
+  "added_at": "2023-02-23T00:00:00Z",
+  "extra_data": {
+    "report_count": 27,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "wildcard",
+    "mobile",
+    "source code"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 25,
+    "in_scope": 9,
+    "out_of_scope": 16,
+    "eligible_for_bounty": 6,
+    "wildcard": 7
+  },
+  "target_activity": {
+    "latest_change_at": null,
+    "latest_added_at": "2026-05-07T12:53:51Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from moderate public report count, older program, generic web scope."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "*.grindr.com",
+  "display_name": "Wildcard",
+  "normalized_identifier": "*.grindr.com",
+  "in_scope": true,
+  "wildcard": true,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical",
+    "base_domain": "grindr.com",
+    "display_name": "Wildcard"
+  },
+  "source_url": "https://hackerone.com/grindr/policy_scopes?type=team",
+  "added_at": "2026-05-07T12:53:51Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T19:35:56Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true,
+  "targetOpportunityScore": 43,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 30.29
+    },
+    "targetType": {
+      "score": 22,
+      "label": "Wildcard",
+      "key": "wildcard"
+    },
+    "reward": {
+      "score": 14,
+      "label": "Good bounty",
+      "maxBounty": 3000,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 7,
+      "label": "Moderate public report count",
+      "reportCount": 27,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "Medium",
+  "competitionRiskReason": "Estimated from moderate public report count, older program, less obvious asset type.",
+  "whyThisTarget": "Wildcard target, with eligible and in scope, strong reward potential, medium competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: *.grindr.com
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

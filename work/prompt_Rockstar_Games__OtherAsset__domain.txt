@@ -1,0 +1,130 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+*.rockstargames.com
+
+Program:
+{
+  "handle": "rockstargames",
+  "name": "Rockstar Games",
+  "date_launched": "2017-03-02",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/000/002/143/db40b290ac0adcde231da85c33a668f610e6f4df_original.png/3f1ab5c6a9b6dadada1e6c8121700b884388bd0a43471fee1897a38ce57d0b2c",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/rockstargames",
+  "report_count": 112,
+  "last_updated": "2026-06-06T19:35:57Z",
+  "targets_updated_at": "2026-05-07T12:58:00Z",
+  "bounty_min": 150,
+  "bounty_max": 2500,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:rockstargames",
+  "added_at": "2017-03-02T00:00:00Z",
+  "extra_data": {
+    "report_count": 112,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "wildcard",
+    "executable"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 15,
+    "in_scope": 9,
+    "out_of_scope": 6,
+    "eligible_for_bounty": 9,
+    "wildcard": 1
+  },
+  "target_activity": {
+    "latest_change_at": null,
+    "latest_added_at": "2026-05-07T12:58:00Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, older program, generic web scope."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "*.rockstargames.com",
+  "display_name": "OtherAsset",
+  "normalized_identifier": "*.rockstargames.com",
+  "in_scope": true,
+  "wildcard": true,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical",
+    "base_domain": "rockstargames.com",
+    "display_name": "OtherAsset"
+  },
+  "source_url": "https://hackerone.com/rockstargames/policy_scopes?type=team",
+  "added_at": "2026-05-07T12:58:00Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T19:35:57Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true,
+  "targetOpportunityScore": 36,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 30.28
+    },
+    "targetType": {
+      "score": 22,
+      "label": "Wildcard",
+      "key": "wildcard"
+    },
+    "reward": {
+      "score": 14,
+      "label": "Good bounty",
+      "maxBounty": 2500,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 0,
+      "label": "High public report count",
+      "reportCount": 112,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, older program, less obvious asset type.",
+  "whyThisTarget": "Wildcard target, with eligible and in scope, strong reward potential, high competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: *.rockstargames.com
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.
