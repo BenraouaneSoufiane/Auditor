@@ -1,10 +1,13 @@
 import os, re, json, time, signal, shutil, asyncio, logging, shlex
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 import httpx
 from fastapi import FastAPI
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -19,6 +22,14 @@ WORKDIR = Path(os.getenv("WORKDIR", "./work")).resolve()
 REPORTS = WORKDIR / "reports"
 REPOS = WORKDIR / "repos"
 CONTRACTS = WORKDIR / "contracts"
+AGENT_BASE_URL = os.getenv("AGENT_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+SAP_REQUIRE_PAYMENT = os.getenv("SAP_REQUIRE_PAYMENT", "true").lower() not in {"0", "false", "no", "off"}
+SAP_PAYMENT_VERIFY_URL = os.getenv("SAP_PAYMENT_VERIFY_URL", "").strip()
+SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS = (
+    os.getenv("SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS", "false").lower() in {"1", "true", "yes", "on"}
+)
+SAP_PRICE_PER_CALL_LAMPORTS = int(os.getenv("SAP_PRICE_PER_CALL_LAMPORTS", "1000"))
+SAP_MIN_ESCROW_DEPOSIT_LAMPORTS = int(os.getenv("SAP_MIN_ESCROW_DEPOSIT_LAMPORTS", "10000"))
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY", "")
 BASESCAN_API_KEY = os.getenv("BASESCAN_API_KEY", "")
@@ -27,6 +38,350 @@ POLYGONSCAN_API_KEY = os.getenv("POLYGONSCAN_API_KEY", "")
 OPTIMISTIC_API_KEY = os.getenv("OPTIMISTIC_API_KEY", "")
 
 app = FastAPI()
+
+HOME_HTML = """
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditor</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b10;
+      --panel: #121821;
+      --panel-soft: #17202c;
+      --text: #eef4ff;
+      --muted: #95a3b7;
+      --line: #243244;
+      --accent: #45d19f;
+      --accent-strong: #24b880;
+      --danger: #ff6b6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(69, 209, 159, 0.15), transparent 28rem),
+        linear-gradient(135deg, #080b10 0%, #101723 52%, #0b1017 100%);
+      color: var(--text);
+    }
+    main {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .intro, .panel {
+      border: 1px solid var(--line);
+      background: rgba(18, 24, 33, 0.88);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+    .intro {
+      min-height: 420px;
+      padding: clamp(28px, 6vw, 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(2.5rem, 6vw, 5.6rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+    .description {
+      margin: 22px 0 0;
+      max-width: 680px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      line-height: 1.65;
+    }
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    button, .link-button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #06110d;
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button:hover, .link-button:hover { background: var(--accent-strong); }
+    button.secondary {
+      color: var(--text);
+      background: transparent;
+      border-color: var(--line);
+    }
+    button.secondary:hover { background: var(--panel-soft); }
+    button.danger {
+      color: #210606;
+      background: var(--danger);
+    }
+    button:disabled {
+      cursor: wait;
+      opacity: 0.68;
+    }
+    .panel {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .panel h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+    .status {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+    .status strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.4rem;
+    }
+    .status span {
+      color: var(--muted);
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      min-height: 82px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(8, 11, 16, 0.42);
+    }
+    .metric b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1.45rem;
+    }
+    .metric small {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #0c1119;
+      color: var(--text);
+      font: inherit;
+    }
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .log {
+      max-height: 220px;
+      overflow: auto;
+      margin: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #070a0f;
+      color: #bfcbda;
+      font: 0.82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 860px) {
+      main { padding: 24px 0; }
+      .hero { grid-template-columns: 1fr; }
+      .intro { min-height: 340px; }
+    }
+    @media (max-width: 520px) {
+      .grid, form { grid-template-columns: 1fr; }
+      .actions, .form-actions { flex-direction: column; }
+      button, .link-button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-label="Auditor home">
+      <div class="intro">
+        <p class="eyebrow">OOBE-PROTOCOL exclusive</p>
+        <h1>Auditor</h1>
+        <p class="description">
+          Really simple audit agent that checks latest bounty programs &amp; audit them.
+          Available exclusively through
+          <a href="https://explorer.oobeprotocol.ai/" target="_blank" rel="noreferrer">OOBE-PROTOCOL</a>.
+        </p>
+        <div class="actions">
+          <a class="link-button" href="https://github.com/BenraouaneSoufiane/Auditor" target="_blank" rel="noreferrer">View Repo</a>
+          <a class="link-button" href="/stats">Raw Stats</a>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="Agent controls">
+        <h2>Agent Control</h2>
+        <div class="status" aria-live="polite">
+          <strong id="state-label">Loading</strong>
+          <span id="current-label">Checking agent status...</span>
+        </div>
+
+        <div class="grid" aria-label="Run metrics">
+          <div class="metric"><b id="reports-count">0</b><small>Reports</small></div>
+          <div class="metric"><b id="errors-count">0</b><small>Errors</small></div>
+          <div class="metric"><b id="skipped-count">0</b><small>Skipped</small></div>
+        </div>
+
+        <form id="launch-form">
+          <label>Page
+            <input name="page" type="number" min="1" value="1">
+          </label>
+          <label>Page size
+            <input name="page_size" type="number" min="1" value="3">
+          </label>
+          <label>Max files
+            <input name="max_files_per_task" type="number" min="1" value="80">
+          </label>
+          <label>Audit timeout
+            <input name="audit_timeout_seconds" type="number" min="1" value="60">
+          </label>
+          <label>Program timeout
+            <input name="program_timeout_seconds" type="number" min="1" value="60">
+          </label>
+          <div class="form-actions">
+            <button id="launch-button" type="submit">Launch</button>
+            <button class="danger" id="stop-button" type="button">Stop</button>
+          </div>
+        </form>
+
+        <pre class="log" id="activity-log">Waiting for activity...</pre>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const stateLabel = document.querySelector("#state-label");
+    const currentLabel = document.querySelector("#current-label");
+    const reportsCount = document.querySelector("#reports-count");
+    const errorsCount = document.querySelector("#errors-count");
+    const skippedCount = document.querySelector("#skipped-count");
+    const activityLog = document.querySelector("#activity-log");
+    const launchButton = document.querySelector("#launch-button");
+    const stopButton = document.querySelector("#stop-button");
+    const form = document.querySelector("#launch-form");
+
+    function rows(title, items, formatter) {
+      if (!items || !items.length) return [`${title}: none`];
+      return [`${title}:`, ...items.slice(-5).map(formatter)];
+    }
+
+    async function refreshStats() {
+      try {
+        const response = await fetch("/stats");
+        const data = await response.json();
+        const running = Boolean(data.running);
+        stateLabel.textContent = running ? "Running" : "Idle";
+        currentLabel.textContent = data.current || (running ? "Starting..." : "Ready to launch");
+        reportsCount.textContent = (data.reports || []).length;
+        errorsCount.textContent = (data.errors || []).length;
+        skippedCount.textContent = (data.skipped || []).length;
+        launchButton.disabled = running;
+        stopButton.disabled = !running;
+
+        const lines = [
+          ...rows("Recent reports", data.reports, item => `- ${item.program || "Program"} / ${item.target || "Target"}`),
+          "",
+          ...rows("Recent errors", data.errors, item => `- ${item.program || "Program"}: ${item.error || "Unknown error"}`),
+          "",
+          ...rows("Recent skipped", data.skipped, item => `- ${item.program || "Program"} / ${item.target || "Target"}: ${item.reason || "Skipped"}`),
+        ];
+        activityLog.textContent = lines.join("\\n");
+      } catch (error) {
+        stateLabel.textContent = "Unavailable";
+        currentLabel.textContent = "Could not load /stats";
+        activityLog.textContent = String(error);
+      }
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      launchButton.disabled = true;
+      const payload = Object.fromEntries(new FormData(form).entries());
+      for (const key of Object.keys(payload)) payload[key] = Number(payload[key]);
+
+      const response = await fetch("/launch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (data.error) activityLog.textContent = data.error;
+      await refreshStats();
+    });
+
+    stopButton.addEventListener("click", async () => {
+      stopButton.disabled = true;
+      await fetch("/stop", { method: "POST" });
+      await refreshStats();
+    });
+
+    refreshStats();
+    setInterval(refreshStats, 2500);
+  </script>
+</body>
+</html>
+"""
 
 state = {
     "running": False,
@@ -47,6 +402,166 @@ class LaunchRequest(BaseModel):
     max_files_per_task: int = 80
     audit_timeout_seconds: int = 60
     program_timeout_seconds: int = 60
+
+
+SAP_AGENT_PROFILE = {
+    "name": "Auditor",
+    "description": "Autonomous bug bounty triage agent for domain targets and audit status reporting.",
+    "agent_id": "auditor.local.sap",
+    "protocols": ["synapse-agent-protocol", "bug-bounty-audit"],
+    "pricing": [
+        {
+            "tier_id": "x402-escrow-standard",
+            "price_per_call": SAP_PRICE_PER_CALL_LAMPORTS,
+            "rate_limit": 6,
+            "max_calls_per_session": 20,
+            "burst_limit": 3,
+            "token_type": "sol",
+            "settlement_mode": "escrow",
+            "min_escrow_deposit": SAP_MIN_ESCROW_DEPOSIT_LAMPORTS,
+        }
+    ],
+    "capabilities": [
+        {
+            "id": "audit.launch",
+            "description": "Launch a bounded bug bounty domain audit run.",
+            "protocol_id": "bug-bounty-audit",
+            "version": "1.0.0",
+        },
+        {
+            "id": "audit.stats",
+            "description": "Read current run state, reports, errors, skips, and trace data.",
+            "protocol_id": "bug-bounty-audit",
+            "version": "1.0.0",
+        },
+        {
+            "id": "audit.stop",
+            "description": "Request the current audit loop to stop.",
+            "protocol_id": "bug-bounty-audit",
+            "version": "1.0.0",
+        },
+    ],
+}
+
+
+SAP_TOOLS = [
+    {
+        "name": "auditor_launch",
+        "protocol": "bug-bounty-audit",
+        "description": "Launch the local Auditor agent against Bug Bounty Radar domain targets.",
+        "category": "Analytics",
+        "method": "POST",
+        "path": "/sap/tools/auditor_launch",
+        "params_count": 5,
+        "required_params": 0,
+        "input_schema": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "page": {"type": "integer", "minimum": 1, "default": 1},
+                "page_size": {"type": "integer", "minimum": 1, "default": 3},
+                "max_files_per_task": {"type": "integer", "minimum": 1, "default": 80},
+                "audit_timeout_seconds": {"type": "integer", "minimum": 1, "default": 60},
+                "program_timeout_seconds": {"type": "integer", "minimum": 1, "default": 60},
+            },
+        },
+        "output_schema": {
+            "type": "object",
+            "properties": {
+                "status": {"type": "string"},
+                "page": {"type": "integer"},
+                "page_size": {"type": "integer"},
+                "error": {"type": "string"},
+            },
+        },
+    },
+    {
+        "name": "auditor_stats",
+        "protocol": "bug-bounty-audit",
+        "description": "Return local Auditor run state, report paths, errors, skips, and traces.",
+        "category": "Analytics",
+        "method": "POST",
+        "path": "/sap/tools/auditor_stats",
+        "params_count": 0,
+        "required_params": 0,
+        "input_schema": {"type": "object", "additionalProperties": False, "properties": {}},
+        "output_schema": {"type": "object"},
+    },
+    {
+        "name": "auditor_stop",
+        "protocol": "bug-bounty-audit",
+        "description": "Stop the currently running local Auditor loop.",
+        "category": "Analytics",
+        "method": "POST",
+        "path": "/sap/tools/auditor_stop",
+        "params_count": 0,
+        "required_params": 0,
+        "input_schema": {"type": "object", "additionalProperties": False, "properties": {}},
+        "output_schema": {
+            "type": "object",
+            "properties": {"status": {"type": "string"}},
+        },
+    },
+]
+
+
+class SapToolCall(BaseModel):
+    arguments: dict[str, Any] = {}
+
+
+def payment_required_response(tool_name: str, detail: str):
+    return JSONResponse(
+        status_code=402,
+        content={
+            "error": "payment_required",
+            "detail": detail,
+            "tool": tool_name,
+            "payment": {
+                "scheme": "x402",
+                "settlement": "escrow",
+                "network": "solana:mainnet-beta",
+                "price_per_call_lamports": SAP_PRICE_PER_CALL_LAMPORTS,
+                "min_escrow_deposit_lamports": SAP_MIN_ESCROW_DEPOSIT_LAMPORTS,
+                "x402_endpoint": f"{AGENT_BASE_URL}/sap/tools",
+            },
+        },
+    )
+
+
+async def verify_sap_payment(request: Request, tool_name: str):
+    if not SAP_REQUIRE_PAYMENT:
+        return None
+
+    payment_header = request.headers.get("x-payment") or request.headers.get("x402-payment")
+    escrow_header = request.headers.get("x-sap-escrow")
+    if not payment_header and not escrow_header:
+        return payment_required_response(tool_name, "Missing x402 payment or SAP escrow receipt header.")
+
+    if not SAP_PAYMENT_VERIFY_URL:
+        if SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS:
+            trace("sap_payment_unverified", tool=tool_name, has_x402=bool(payment_header), has_escrow=bool(escrow_header))
+            return None
+        return payment_required_response(
+            tool_name,
+            "Payment receipt supplied, but SAP_PAYMENT_VERIFY_URL is not configured for verification.",
+        )
+
+    payload = {
+        "tool": tool_name,
+        "price_per_call_lamports": SAP_PRICE_PER_CALL_LAMPORTS,
+        "min_escrow_deposit_lamports": SAP_MIN_ESCROW_DEPOSIT_LAMPORTS,
+        "x_payment": payment_header,
+        "sap_escrow": escrow_header,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.post(SAP_PAYMENT_VERIFY_URL, json=payload)
+        if response.status_code // 100 == 2:
+            trace("sap_payment_verified", tool=tool_name, verifier=SAP_PAYMENT_VERIFY_URL)
+            return None
+        return payment_required_response(tool_name, f"Payment verifier rejected receipt with HTTP {response.status_code}.")
+    except Exception as e:
+        return payment_required_response(tool_name, f"Payment verification failed: {e}")
 
 
 def safe_name(v: str) -> str:
@@ -861,6 +1376,63 @@ async def agent_loop(req: LaunchRequest):
         )
         state["running"] = False
         state["current"] = None
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    return HOME_HTML
+
+
+def sap_manifest():
+    tools = []
+    for tool in SAP_TOOLS:
+        item = dict(tool)
+        item["url"] = f"{AGENT_BASE_URL}{tool['path']}"
+        item["input_schema"] = tool["input_schema"]
+        item["output_schema"] = tool["output_schema"]
+        tools.append(item)
+
+    return {
+        "agent": {
+            **SAP_AGENT_PROFILE,
+            "agent_uri": f"{AGENT_BASE_URL}/sap/agent",
+            "x402_endpoint": f"{AGENT_BASE_URL}/sap/tools",
+        },
+        "tools": tools,
+    }
+
+
+@app.get("/sap/agent")
+async def sap_agent():
+    return sap_manifest()["agent"]
+
+
+@app.get("/sap/tools")
+async def sap_tools():
+    return sap_manifest()
+
+
+@app.get("/sap/manifest")
+async def sap_manifest_route():
+    return sap_manifest()
+
+
+@app.post("/sap/tools/{tool_name}")
+async def sap_tool_call(tool_name: str, call: SapToolCall, request: Request):
+    trace("sap_tool_call", tool=tool_name, arguments=call.arguments)
+
+    payment_error = await verify_sap_payment(request, tool_name)
+    if payment_error:
+        return payment_error
+
+    if tool_name == "auditor_launch":
+        return await launch(LaunchRequest(**call.arguments))
+    if tool_name == "auditor_stats":
+        return await stats()
+    if tool_name == "auditor_stop":
+        return await stop()
+
+    return {"error": f"Unknown SAP tool: {tool_name}"}
 
 
 @app.post("/launch")

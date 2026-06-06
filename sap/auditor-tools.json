@@ -1,0 +1,99 @@
+{
+  "agent": {
+    "name": "Auditor",
+    "description": "Autonomous bug bounty triage agent for domain targets and audit status reporting.",
+    "agentId": "auditor.local.sap",
+    "protocols": ["synapse-agent-protocol", "bug-bounty-audit"],
+    "pricing": [
+      {
+        "tierId": "x402-escrow-standard",
+        "pricePerCall": "1000",
+        "rateLimit": 6,
+        "maxCallsPerSession": 20,
+        "burstLimit": 3,
+        "tokenType": "sol",
+        "settlementMode": "escrow",
+        "minEscrowDeposit": "10000"
+      }
+    ],
+    "capabilities": [
+      {
+        "id": "audit.launch",
+        "description": "Launch a bounded bug bounty domain audit run.",
+        "protocolId": "bug-bounty-audit",
+        "version": "1.0.0"
+      },
+      {
+        "id": "audit.stats",
+        "description": "Read current run state, reports, errors, skips, and trace data.",
+        "protocolId": "bug-bounty-audit",
+        "version": "1.0.0"
+      },
+      {
+        "id": "audit.stop",
+        "description": "Request the current audit loop to stop.",
+        "protocolId": "bug-bounty-audit",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "auditor_launch",
+      "protocol": "bug-bounty-audit",
+      "description": "Launch the local Auditor agent against Bug Bounty Radar domain targets.",
+      "category": 8,
+      "httpMethod": 1,
+      "paramsCount": 5,
+      "requiredParams": 0,
+      "isCompound": false,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "page": { "type": "integer", "minimum": 1, "default": 1 },
+          "page_size": { "type": "integer", "minimum": 1, "default": 3 },
+          "max_files_per_task": { "type": "integer", "minimum": 1, "default": 80 },
+          "audit_timeout_seconds": { "type": "integer", "minimum": 1, "default": 60 },
+          "program_timeout_seconds": { "type": "integer", "minimum": 1, "default": 60 }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "error": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "auditor_stats",
+      "protocol": "bug-bounty-audit",
+      "description": "Return local Auditor run state, report paths, errors, skips, and traces.",
+      "category": 8,
+      "httpMethod": 1,
+      "paramsCount": 0,
+      "requiredParams": 0,
+      "isCompound": false,
+      "inputSchema": { "type": "object", "additionalProperties": false, "properties": {} },
+      "outputSchema": { "type": "object" }
+    },
+    {
+      "name": "auditor_stop",
+      "protocol": "bug-bounty-audit",
+      "description": "Stop the currently running local Auditor loop.",
+      "category": 8,
+      "httpMethod": 1,
+      "paramsCount": 0,
+      "requiredParams": 0,
+      "isCompound": false,
+      "inputSchema": { "type": "object", "additionalProperties": false, "properties": {} },
+      "outputSchema": {
+        "type": "object",
+        "properties": { "status": { "type": "string" } }
+      }
+    }
+  ]
+}

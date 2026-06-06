@@ -1,147 +1,98 @@
-{"time": 1780774893.0335681, "event": "agent_loop_start", "page": 1, "page_size": 10, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60, "ccr_cmd": "claude -p --setting-sources project,local"}
-{"time": 1780774893.5893884, "event": "programs_fetched", "count": 10}
-{"time": 1780774893.591375, "event": "program_start", "program": "Goldman Sachs", "program_id": "HackerOne:goldmansachs"}
-{"time": 1780774895.8369944, "event": "targets_fetched", "program": "Goldman Sachs", "count": 65}
-{"time": 1780774895.8408244, "event": "target_selected", "program": "Goldman Sachs", "target": "OtherAsset", "target_type": "domain", "identifier": "*.advisorsolutions.gs.com", "kind": "domain"}
-{"time": 1780774895.843518, "event": "target_audit_start", "program": "Goldman Sachs", "target": "OtherAsset", "source": "*.advisorsolutions.gs.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780774895.8441625, "event": "prompt_written", "target": "*.advisorsolutions.gs.com", "prompt": "/root/auditor/work/prompt_Goldman_Sachs__OtherAsset__domain.txt", "prompt_bytes": 3703, "kind": "domain"}
-{"time": 1780774895.8451653, "event": "llm_start", "label": "Goldman_Sachs__OtherAsset__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3703, "timeout_seconds": 60}
-{"time": 1780774924.5167305, "event": "llm_done", "label": "Goldman_Sachs__OtherAsset__domain:domain", "exit_code": 0, "elapsed_seconds": 28.67, "output_bytes": 2803, "stderr_preview": ""}
-{"time": 1780774924.5217035, "event": "report_written", "target": "*.advisorsolutions.gs.com", "report": "/root/auditor/work/reports/Goldman_Sachs__OtherAsset__domain.md", "report_bytes": 2803, "mode": "domain"}
-{"time": 1780774924.5221257, "event": "target_audit_done", "kind": "domain", "program": "Goldman Sachs", "target": "OtherAsset", "source": "*.advisorsolutions.gs.com", "report": "/root/auditor/work/reports/Goldman_Sachs__OtherAsset__domain.md", "finished_at": 1780774924.5221126}
-{"time": 1780774924.5236812, "event": "target_selected", "program": "Goldman Sachs", "target": "OtherAsset", "target_type": "domain", "identifier": "*.ayco.com", "kind": "domain"}
-{"time": 1780774924.5241206, "event": "target_audit_start", "program": "Goldman Sachs", "target": "OtherAsset", "source": "*.ayco.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780774924.5290065, "event": "prompt_written", "target": "*.ayco.com", "prompt": "/root/auditor/work/prompt_Goldman_Sachs__OtherAsset__domain.txt", "prompt_bytes": 3628, "kind": "domain"}
-{"time": 1780774924.529757, "event": "llm_start", "label": "Goldman_Sachs__OtherAsset__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3628, "timeout_seconds": 60}
-{"time": 1780774954.3434305, "event": "llm_done", "label": "Goldman_Sachs__OtherAsset__domain:domain", "exit_code": 0, "elapsed_seconds": 29.81, "output_bytes": 2825, "stderr_preview": ""}
-{"time": 1780774954.3479137, "event": "report_written", "target": "*.ayco.com", "report": "/root/auditor/work/reports/Goldman_Sachs__OtherAsset__domain.md", "report_bytes": 2825, "mode": "domain"}
-{"time": 1780774954.3482552, "event": "target_audit_done", "kind": "domain", "program": "Goldman Sachs", "target": "OtherAsset", "source": "*.ayco.com", "report": "/root/auditor/work/reports/Goldman_Sachs__OtherAsset__domain.md", "finished_at": 1780774954.3482451}
-{"time": 1780774954.3489046, "event": "program_timeout_skip", "program": "Goldman Sachs", "elapsed_seconds": 60.76, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780774954.3494487, "event": "program_start", "program": "JNJ Mobile", "program_id": "HackerOne:jnj_mobile"}
-{"time": 1780774954.605138, "event": "targets_fetched", "program": "JNJ Mobile", "count": 1}
-{"time": 1780774954.6076365, "event": "target_selected", "program": "JNJ Mobile", "target": "AndroidPlayStore", "target_type": "mobile", "identifier": "com.jnj.mocospace.android", "kind": "domain"}
-{"time": 1780774954.6080036, "event": "target_audit_start", "program": "JNJ Mobile", "target": "AndroidPlayStore", "source": "com.jnj.mocospace.android", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780774954.608634, "event": "prompt_written", "target": "com.jnj.mocospace.android", "prompt": "/root/auditor/work/prompt_JNJ_Mobile__AndroidPlayStore__domain.txt", "prompt_bytes": 2782, "kind": "domain"}
-{"time": 1780774954.6098351, "event": "llm_start", "label": "JNJ_Mobile__AndroidPlayStore__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2782, "timeout_seconds": 60}
-{"time": 1780774980.6658459, "event": "llm_done", "label": "JNJ_Mobile__AndroidPlayStore__domain:domain", "exit_code": 0, "elapsed_seconds": 26.05, "output_bytes": 2969, "stderr_preview": ""}
-{"time": 1780774980.66845, "event": "report_written", "target": "com.jnj.mocospace.android", "report": "/root/auditor/work/reports/JNJ_Mobile__AndroidPlayStore__domain.md", "report_bytes": 2969, "mode": "domain"}
-{"time": 1780774980.6688008, "event": "target_audit_done", "kind": "domain", "program": "JNJ Mobile", "target": "AndroidPlayStore", "source": "com.jnj.mocospace.android", "report": "/root/auditor/work/reports/JNJ_Mobile__AndroidPlayStore__domain.md", "finished_at": 1780774980.6687922}
-{"time": 1780774980.6690898, "event": "program_start", "program": "Rockstar Games", "program_id": "HackerOne:rockstargames"}
-{"time": 1780774980.9026496, "event": "targets_fetched", "program": "Rockstar Games", "count": 15}
-{"time": 1780774980.9039247, "event": "target_selected", "program": "Rockstar Games", "target": "OtherAsset", "target_type": "domain", "identifier": "*.rockstargames.com", "kind": "domain"}
-{"time": 1780774980.9042778, "event": "target_audit_start", "program": "Rockstar Games", "target": "OtherAsset", "source": "*.rockstargames.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780774980.9049823, "event": "prompt_written", "target": "*.rockstargames.com", "prompt": "/root/auditor/work/prompt_Rockstar_Games__OtherAsset__domain.txt", "prompt_bytes": 3695, "kind": "domain"}
-{"time": 1780774980.907271, "event": "llm_start", "label": "Rockstar_Games__OtherAsset__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3695, "timeout_seconds": 60}
-{"time": 1780775002.901913, "event": "llm_done", "label": "Rockstar_Games__OtherAsset__domain:domain", "exit_code": 0, "elapsed_seconds": 21.99, "output_bytes": 2929, "stderr_preview": ""}
-{"time": 1780775002.9054565, "event": "report_written", "target": "*.rockstargames.com", "report": "/root/auditor/work/reports/Rockstar_Games__OtherAsset__domain.md", "report_bytes": 2929, "mode": "domain"}
-{"time": 1780775002.905723, "event": "target_audit_done", "kind": "domain", "program": "Rockstar Games", "target": "OtherAsset", "source": "*.rockstargames.com", "report": "/root/auditor/work/reports/Rockstar_Games__OtherAsset__domain.md", "finished_at": 1780775002.9057126}
-{"time": 1780775002.9060335, "event": "target_selected", "program": "Rockstar Games", "target": "Domain", "target_type": "domain", "identifier": "anomotion.com", "kind": "domain"}
-{"time": 1780775002.9064772, "event": "target_audit_start", "program": "Rockstar Games", "target": "Domain", "source": "anomotion.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775002.9077315, "event": "prompt_written", "target": "anomotion.com", "prompt": "/root/auditor/work/prompt_Rockstar_Games__Domain__domain.txt", "prompt_bytes": 2773, "kind": "domain"}
-{"time": 1780775002.910403, "event": "llm_start", "label": "Rockstar_Games__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2773, "timeout_seconds": 60}
-{"time": 1780775028.4581537, "event": "llm_done", "label": "Rockstar_Games__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 25.55, "output_bytes": 2846, "stderr_preview": ""}
-{"time": 1780775028.4615686, "event": "report_written", "target": "anomotion.com", "report": "/root/auditor/work/reports/Rockstar_Games__Domain__domain.md", "report_bytes": 2846, "mode": "domain"}
-{"time": 1780775028.4626899, "event": "target_audit_done", "kind": "domain", "program": "Rockstar Games", "target": "Domain", "source": "anomotion.com", "report": "/root/auditor/work/reports/Rockstar_Games__Domain__domain.md", "finished_at": 1780775028.4626791}
-{"time": 1780775028.4641469, "event": "target_selected", "program": "Rockstar Games", "target": "Domain", "target_type": "domain", "identifier": "any-invalid-domains.rockstargames.com", "kind": "domain"}
-{"time": 1780775028.4666634, "event": "target_audit_start", "program": "Rockstar Games", "target": "Domain", "source": "any-invalid-domains.rockstargames.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775028.4698029, "event": "prompt_written", "target": "any-invalid-domains.rockstargames.com", "prompt": "/root/auditor/work/prompt_Rockstar_Games__Domain__domain.txt", "prompt_bytes": 2869, "kind": "domain"}
-{"time": 1780775028.4717019, "event": "llm_start", "label": "Rockstar_Games__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2869, "timeout_seconds": 60}
-{"time": 1780775052.4868906, "event": "llm_done", "label": "Rockstar_Games__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 24.01, "output_bytes": 2590, "stderr_preview": ""}
-{"time": 1780775052.4885564, "event": "report_written", "target": "any-invalid-domains.rockstargames.com", "report": "/root/auditor/work/reports/Rockstar_Games__Domain__domain.md", "report_bytes": 2590, "mode": "domain"}
-{"time": 1780775052.488901, "event": "target_audit_done", "kind": "domain", "program": "Rockstar Games", "target": "Domain", "source": "any-invalid-domains.rockstargames.com", "report": "/root/auditor/work/reports/Rockstar_Games__Domain__domain.md", "finished_at": 1780775052.4888904}
-{"time": 1780775052.4892795, "event": "program_timeout_skip", "program": "Rockstar Games", "elapsed_seconds": 71.82, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780775052.489638, "event": "program_start", "program": "Starbucks Japan", "program_id": "HackerOne:starbucks_japan"}
-{"time": 1780775052.754396, "event": "targets_fetched", "program": "Starbucks Japan", "count": 7}
-{"time": 1780775052.756678, "event": "target_selected", "program": "Starbucks Japan", "target": "Domain", "target_type": "domain", "identifier": "cart.starbucks.co.jp", "kind": "domain"}
-{"time": 1780775052.75803, "event": "target_audit_start", "program": "Starbucks Japan", "target": "Domain", "source": "cart.starbucks.co.jp", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775052.7597508, "event": "prompt_written", "target": "cart.starbucks.co.jp", "prompt": "/root/auditor/work/prompt_Starbucks_Japan__Domain__domain.txt", "prompt_bytes": 3618, "kind": "domain"}
-{"time": 1780775052.7614524, "event": "llm_start", "label": "Starbucks_Japan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3618, "timeout_seconds": 60}
-{"time": 1780775072.6574197, "event": "llm_done", "label": "Starbucks_Japan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 19.9, "output_bytes": 2887, "stderr_preview": ""}
-{"time": 1780775072.6607656, "event": "report_written", "target": "cart.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "report_bytes": 2887, "mode": "domain"}
-{"time": 1780775072.6612117, "event": "target_audit_done", "kind": "domain", "program": "Starbucks Japan", "target": "Domain", "source": "cart.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "finished_at": 1780775072.661201}
-{"time": 1780775072.661651, "event": "target_selected", "program": "Starbucks Japan", "target": "Domain", "target_type": "domain", "identifier": "gift.starbucks.co.jp", "kind": "domain"}
-{"time": 1780775072.6622345, "event": "target_audit_start", "program": "Starbucks Japan", "target": "Domain", "source": "gift.starbucks.co.jp", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775072.664043, "event": "prompt_written", "target": "gift.starbucks.co.jp", "prompt": "/root/auditor/work/prompt_Starbucks_Japan__Domain__domain.txt", "prompt_bytes": 3618, "kind": "domain"}
-{"time": 1780775072.6650946, "event": "llm_start", "label": "Starbucks_Japan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3618, "timeout_seconds": 60}
-{"time": 1780775095.073875, "event": "llm_done", "label": "Starbucks_Japan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 22.41, "output_bytes": 2806, "stderr_preview": ""}
-{"time": 1780775095.0808072, "event": "report_written", "target": "gift.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "report_bytes": 2806, "mode": "domain"}
-{"time": 1780775095.0826018, "event": "target_audit_done", "kind": "domain", "program": "Starbucks Japan", "target": "Domain", "source": "gift.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "finished_at": 1780775095.082593}
-{"time": 1780775095.083496, "event": "target_selected", "program": "Starbucks Japan", "target": "Domain", "target_type": "domain", "identifier": "login.starbucks.co.jp", "kind": "domain"}
-{"time": 1780775095.0847487, "event": "target_audit_start", "program": "Starbucks Japan", "target": "Domain", "source": "login.starbucks.co.jp", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775095.0855544, "event": "prompt_written", "target": "login.starbucks.co.jp", "prompt": "/root/auditor/work/prompt_Starbucks_Japan__Domain__domain.txt", "prompt_bytes": 3629, "kind": "domain"}
-{"time": 1780775095.087893, "event": "llm_start", "label": "Starbucks_Japan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3629, "timeout_seconds": 60}
-{"time": 1780775115.3749204, "event": "llm_done", "label": "Starbucks_Japan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 20.28, "output_bytes": 2593, "stderr_preview": ""}
-{"time": 1780775115.3795843, "event": "report_written", "target": "login.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "report_bytes": 2593, "mode": "domain"}
-{"time": 1780775115.3800213, "event": "target_audit_done", "kind": "domain", "program": "Starbucks Japan", "target": "Domain", "source": "login.starbucks.co.jp", "report": "/root/auditor/work/reports/Starbucks_Japan__Domain__domain.md", "finished_at": 1780775115.3800113}
-{"time": 1780775115.381384, "event": "program_timeout_skip", "program": "Starbucks Japan", "elapsed_seconds": 62.89, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780775115.3822544, "event": "program_start", "program": "Coupang Taiwan", "program_id": "HackerOne:coupang_tw"}
-{"time": 1780775117.2831097, "event": "targets_fetched", "program": "Coupang Taiwan", "count": 47}
-{"time": 1780775117.2871792, "event": "target_selected", "program": "Coupang Taiwan", "target": "Domain", "target_type": "domain", "identifier": "ads-partners.tw.coupang.com", "kind": "domain"}
-{"time": 1780775117.2881594, "event": "target_audit_start", "program": "Coupang Taiwan", "target": "Domain", "source": "ads-partners.tw.coupang.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775117.2912703, "event": "prompt_written", "target": "ads-partners.tw.coupang.com", "prompt": "/root/auditor/work/prompt_Coupang_Taiwan__Domain__domain.txt", "prompt_bytes": 3543, "kind": "domain"}
-{"time": 1780775117.292432, "event": "llm_start", "label": "Coupang_Taiwan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3543, "timeout_seconds": 60}
-{"time": 1780775142.8523755, "event": "llm_done", "label": "Coupang_Taiwan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 25.56, "output_bytes": 2915, "stderr_preview": ""}
-{"time": 1780775142.8533983, "event": "report_written", "target": "ads-partners.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "report_bytes": 2915, "mode": "domain"}
-{"time": 1780775142.8541563, "event": "target_audit_done", "kind": "domain", "program": "Coupang Taiwan", "target": "Domain", "source": "ads-partners.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "finished_at": 1780775142.8541455}
-{"time": 1780775142.8552895, "event": "target_selected", "program": "Coupang Taiwan", "target": "Domain", "target_type": "domain", "identifier": "cart-front-api.tw.coupang.com", "kind": "domain"}
-{"time": 1780775142.8557484, "event": "target_audit_start", "program": "Coupang Taiwan", "target": "Domain", "source": "cart-front-api.tw.coupang.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775142.856819, "event": "prompt_written", "target": "cart-front-api.tw.coupang.com", "prompt": "/root/auditor/work/prompt_Coupang_Taiwan__Domain__domain.txt", "prompt_bytes": 3551, "kind": "domain"}
-{"time": 1780775142.8574204, "event": "llm_start", "label": "Coupang_Taiwan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3551, "timeout_seconds": 60}
-{"time": 1780775164.6336393, "event": "llm_done", "label": "Coupang_Taiwan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 21.78, "output_bytes": 2884, "stderr_preview": ""}
-{"time": 1780775164.6365576, "event": "report_written", "target": "cart-front-api.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "report_bytes": 2884, "mode": "domain"}
-{"time": 1780775164.637001, "event": "target_audit_done", "kind": "domain", "program": "Coupang Taiwan", "target": "Domain", "source": "cart-front-api.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "finished_at": 1780775164.6369758}
-{"time": 1780775164.6393964, "event": "target_selected", "program": "Coupang Taiwan", "target": "Domain", "target_type": "domain", "identifier": "cart.tw.coupang.com", "kind": "domain"}
-{"time": 1780775164.6397815, "event": "target_audit_start", "program": "Coupang Taiwan", "target": "Domain", "source": "cart.tw.coupang.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775164.6433992, "event": "prompt_written", "target": "cart.tw.coupang.com", "prompt": "/root/auditor/work/prompt_Coupang_Taiwan__Domain__domain.txt", "prompt_bytes": 3511, "kind": "domain"}
-{"time": 1780775164.643927, "event": "llm_start", "label": "Coupang_Taiwan__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3511, "timeout_seconds": 60}
-{"time": 1780775188.2211099, "event": "llm_done", "label": "Coupang_Taiwan__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 23.58, "output_bytes": 2881, "stderr_preview": ""}
-{"time": 1780775188.2245173, "event": "report_written", "target": "cart.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "report_bytes": 2881, "mode": "domain"}
-{"time": 1780775188.2249138, "event": "target_audit_done", "kind": "domain", "program": "Coupang Taiwan", "target": "Domain", "source": "cart.tw.coupang.com", "report": "/root/auditor/work/reports/Coupang_Taiwan__Domain__domain.md", "finished_at": 1780775188.224903}
-{"time": 1780775188.2265165, "event": "program_timeout_skip", "program": "Coupang Taiwan", "elapsed_seconds": 72.84, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780775188.2267866, "event": "program_start", "program": "Gmelius", "program_id": "HackerOne:gmelius"}
-{"time": 1780775188.5010595, "event": "targets_fetched", "program": "Gmelius", "count": 4}
-{"time": 1780775188.504157, "event": "target_selected", "program": "Gmelius", "target": "Domain", "target_type": "domain", "identifier": "api.gmelius.com", "kind": "domain"}
-{"time": 1780775188.5048087, "event": "target_audit_start", "program": "Gmelius", "target": "Domain", "source": "api.gmelius.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775188.5059013, "event": "prompt_written", "target": "api.gmelius.com", "prompt": "/root/auditor/work/prompt_Gmelius__Domain__domain.txt", "prompt_bytes": 2671, "kind": "domain"}
-{"time": 1780775188.5081522, "event": "llm_start", "label": "Gmelius__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2671, "timeout_seconds": 60}
-{"time": 1780775214.7948046, "event": "llm_done", "label": "Gmelius__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 26.29, "output_bytes": 3386, "stderr_preview": ""}
-{"time": 1780775214.7994275, "event": "report_written", "target": "api.gmelius.com", "report": "/root/auditor/work/reports/Gmelius__Domain__domain.md", "report_bytes": 3386, "mode": "domain"}
-{"time": 1780775214.7998624, "event": "target_audit_done", "kind": "domain", "program": "Gmelius", "target": "Domain", "source": "api.gmelius.com", "report": "/root/auditor/work/reports/Gmelius__Domain__domain.md", "finished_at": 1780775214.799852}
-{"time": 1780775214.80034, "event": "target_selected", "program": "Gmelius", "target": "Domain", "target_type": "domain", "identifier": "app.gmelius.com", "kind": "domain"}
-{"time": 1780775214.8024895, "event": "target_audit_start", "program": "Gmelius", "target": "Domain", "source": "app.gmelius.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775214.803188, "event": "prompt_written", "target": "app.gmelius.com", "prompt": "/root/auditor/work/prompt_Gmelius__Domain__domain.txt", "prompt_bytes": 2671, "kind": "domain"}
-{"time": 1780775214.8048193, "event": "llm_start", "label": "Gmelius__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2671, "timeout_seconds": 60}
-{"time": 1780775249.9417377, "event": "llm_done", "label": "Gmelius__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 35.14, "output_bytes": 3007, "stderr_preview": ""}
-{"time": 1780775249.9488597, "event": "report_written", "target": "app.gmelius.com", "report": "/root/auditor/work/reports/Gmelius__Domain__domain.md", "report_bytes": 3007, "mode": "domain"}
-{"time": 1780775249.9492176, "event": "target_audit_done", "kind": "domain", "program": "Gmelius", "target": "Domain", "source": "app.gmelius.com", "report": "/root/auditor/work/reports/Gmelius__Domain__domain.md", "finished_at": 1780775249.9492073}
-{"time": 1780775249.9511762, "event": "program_timeout_skip", "program": "Gmelius", "elapsed_seconds": 61.72, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780775249.9531531, "event": "program_start", "program": "Grindr", "program_id": "HackerOne:grindr"}
-{"time": 1780775250.220251, "event": "targets_fetched", "program": "Grindr", "count": 25}
-{"time": 1780775250.2223842, "event": "target_selected", "program": "Grindr", "target": "Wildcard", "target_type": "domain", "identifier": "*.dev.grindr.io", "kind": "domain"}
-{"time": 1780775250.2244523, "event": "target_audit_start", "program": "Grindr", "target": "Wildcard", "source": "*.dev.grindr.io", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775250.225171, "event": "prompt_written", "target": "*.dev.grindr.io", "prompt": "/root/auditor/work/prompt_Grindr__Wildcard__domain.txt", "prompt_bytes": 2792, "kind": "domain"}
-{"time": 1780775250.2258196, "event": "llm_start", "label": "Grindr__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2792, "timeout_seconds": 60}
-{"time": 1780775273.8044286, "event": "llm_done", "label": "Grindr__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 23.58, "output_bytes": 3446, "stderr_preview": ""}
-{"time": 1780775273.8067183, "event": "report_written", "target": "*.dev.grindr.io", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "report_bytes": 3446, "mode": "domain"}
-{"time": 1780775273.8072543, "event": "target_audit_done", "kind": "domain", "program": "Grindr", "target": "Wildcard", "source": "*.dev.grindr.io", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "finished_at": 1780775273.8072388}
-{"time": 1780775273.8078744, "event": "target_selected", "program": "Grindr", "target": "Wildcard", "target_type": "domain", "identifier": "*.dev2.grindr.io", "kind": "domain"}
-{"time": 1780775273.8085794, "event": "target_audit_start", "program": "Grindr", "target": "Wildcard", "source": "*.dev2.grindr.io", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775273.8101964, "event": "prompt_written", "target": "*.dev2.grindr.io", "prompt": "/root/auditor/work/prompt_Grindr__Wildcard__domain.txt", "prompt_bytes": 2797, "kind": "domain"}
-{"time": 1780775273.8107462, "event": "llm_start", "label": "Grindr__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2797, "timeout_seconds": 60}
-{"time": 1780775299.469522, "event": "llm_done", "label": "Grindr__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 25.66, "output_bytes": 3156, "stderr_preview": ""}
-{"time": 1780775299.4718606, "event": "report_written", "target": "*.dev2.grindr.io", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "report_bytes": 3156, "mode": "domain"}
-{"time": 1780775299.4723897, "event": "target_audit_done", "kind": "domain", "program": "Grindr", "target": "Wildcard", "source": "*.dev2.grindr.io", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "finished_at": 1780775299.4723806}
-{"time": 1780775299.4735596, "event": "target_selected", "program": "Grindr", "target": "Wildcard", "target_type": "domain", "identifier": "*.grindr.com", "kind": "domain"}
-{"time": 1780775299.474288, "event": "target_audit_start", "program": "Grindr", "target": "Wildcard", "source": "*.grindr.com", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775299.4775531, "event": "prompt_written", "target": "*.grindr.com", "prompt": "/root/auditor/work/prompt_Grindr__Wildcard__domain.txt", "prompt_bytes": 3608, "kind": "domain"}
-{"time": 1780775299.4780636, "event": "llm_start", "label": "Grindr__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3608, "timeout_seconds": 60}
-{"time": 1780775326.8422332, "event": "llm_done", "label": "Grindr__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 27.36, "output_bytes": 3190, "stderr_preview": ""}
-{"time": 1780775326.8447738, "event": "report_written", "target": "*.grindr.com", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "report_bytes": 3190, "mode": "domain"}
-{"time": 1780775326.845063, "event": "target_audit_done", "kind": "domain", "program": "Grindr", "target": "Wildcard", "source": "*.grindr.com", "report": "/root/auditor/work/reports/Grindr__Wildcard__domain.md", "finished_at": 1780775326.8450537}
-{"time": 1780775326.846331, "event": "program_timeout_skip", "program": "Grindr", "elapsed_seconds": 76.89, "timeout_seconds": 60, "remaining_targets": "not processed"}
-{"time": 1780775326.846602, "event": "program_start", "program": "Ring", "program_id": "HackerOne:ring"}
-{"time": 1780775327.0717986, "event": "targets_fetched", "program": "Ring", "count": 33}
-{"time": 1780775327.0723894, "event": "target_selected", "program": "Ring", "target": "Wildcard", "target_type": "domain", "identifier": "https://*.blinkforhome.com/*", "kind": "domain"}
-{"time": 1780775327.073373, "event": "target_audit_start", "program": "Ring", "target": "Wildcard", "source": "https://*.blinkforhome.com/*", "kind": "domain", "timeout_seconds": 60}
-{"time": 1780775327.0749257, "event": "prompt_written", "target": "https://*.blinkforhome.com/*", "prompt": "/root/auditor/work/prompt_Ring__Wildcard__domain.txt", "prompt_bytes": 3671, "kind": "domain"}
-{"time": 1780775327.077464, "event": "llm_start", "label": "Ring__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3671, "timeout_seconds": 60}
+{"time": 1780775972.6897712, "event": "agent_loop_start", "page": 1, "page_size": 3, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60, "ccr_cmd": "claude -p --setting-sources project,local"}
+{"time": 1780775972.9710348, "event": "programs_fetched", "count": 3}
+{"time": 1780775972.9728415, "event": "program_start", "program": "Regions Financial", "program_id": "HackerOne:regions_financial"}
+{"time": 1780775973.154024, "event": "targets_fetched", "program": "Regions Financial", "count": 13}
+{"time": 1780775973.1563885, "event": "target_selected", "program": "Regions Financial", "target": "Domain", "target_type": "domain", "identifier": "clearsightadvisors.com", "kind": "domain"}
+{"time": 1780775973.1568804, "event": "target_audit_start", "program": "Regions Financial", "target": "Domain", "source": "clearsightadvisors.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780775973.1588104, "event": "prompt_written", "target": "clearsightadvisors.com", "prompt": "/root/auditor/work/prompt_Regions_Financial__Domain__domain.txt", "prompt_bytes": 2796, "kind": "domain"}
+{"time": 1780775973.1615644, "event": "llm_start", "label": "Regions_Financial__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2796, "timeout_seconds": 60}
+{"time": 1780776006.065985, "event": "llm_done", "label": "Regions_Financial__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 32.9, "output_bytes": 2900, "stderr_preview": ""}
+{"time": 1780776006.0679867, "event": "report_written", "target": "clearsightadvisors.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "report_bytes": 2900, "mode": "domain"}
+{"time": 1780776006.069507, "event": "target_audit_done", "kind": "domain", "program": "Regions Financial", "target": "Domain", "source": "clearsightadvisors.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "finished_at": 1780776006.069494}
+{"time": 1780776006.0701056, "event": "target_selected", "program": "Regions Financial", "target": "Domain", "target_type": "domain", "identifier": "enerbank.com", "kind": "domain"}
+{"time": 1780776006.0709872, "event": "target_audit_start", "program": "Regions Financial", "target": "Domain", "source": "enerbank.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776006.0726085, "event": "prompt_written", "target": "enerbank.com", "prompt": "/root/auditor/work/prompt_Regions_Financial__Domain__domain.txt", "prompt_bytes": 2756, "kind": "domain"}
+{"time": 1780776006.074035, "event": "llm_start", "label": "Regions_Financial__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2756, "timeout_seconds": 60}
+{"time": 1780776029.0140002, "event": "llm_done", "label": "Regions_Financial__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 22.94, "output_bytes": 2789, "stderr_preview": ""}
+{"time": 1780776029.017126, "event": "report_written", "target": "enerbank.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "report_bytes": 2789, "mode": "domain"}
+{"time": 1780776029.0190513, "event": "target_audit_done", "kind": "domain", "program": "Regions Financial", "target": "Domain", "source": "enerbank.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "finished_at": 1780776029.0190346}
+{"time": 1780776029.0198574, "event": "target_selected", "program": "Regions Financial", "target": "Domain", "target_type": "domain", "identifier": "firststerling.com", "kind": "domain"}
+{"time": 1780776029.0211241, "event": "target_audit_start", "program": "Regions Financial", "target": "Domain", "source": "firststerling.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776029.0241947, "event": "prompt_written", "target": "firststerling.com", "prompt": "/root/auditor/work/prompt_Regions_Financial__Domain__domain.txt", "prompt_bytes": 2776, "kind": "domain"}
+{"time": 1780776029.0257196, "event": "llm_start", "label": "Regions_Financial__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2776, "timeout_seconds": 60}
+{"time": 1780776057.583852, "event": "llm_done", "label": "Regions_Financial__Domain__domain:domain", "exit_code": 0, "elapsed_seconds": 28.56, "output_bytes": 3121, "stderr_preview": ""}
+{"time": 1780776057.5846963, "event": "report_written", "target": "firststerling.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "report_bytes": 3121, "mode": "domain"}
+{"time": 1780776057.5862832, "event": "target_audit_done", "kind": "domain", "program": "Regions Financial", "target": "Domain", "source": "firststerling.com", "report": "/root/auditor/work/reports/Regions_Financial__Domain__domain.md", "finished_at": 1780776057.5862746}
+{"time": 1780776057.5867023, "event": "program_timeout_skip", "program": "Regions Financial", "elapsed_seconds": 84.61, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780776057.5875378, "event": "program_start", "program": "Capital One", "program_id": "HackerOne:capital-one"}
+{"time": 1780776057.7823992, "event": "targets_fetched", "program": "Capital One", "count": 43}
+{"time": 1780776057.7829187, "event": "target_selected", "program": "Capital One", "target": "OtherAsset", "target_type": "domain", "identifier": "*.bluetarp.com", "kind": "domain"}
+{"time": 1780776057.7832634, "event": "target_audit_start", "program": "Capital One", "target": "OtherAsset", "source": "*.bluetarp.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776057.7838774, "event": "prompt_written", "target": "*.bluetarp.com", "prompt": "/root/auditor/work/prompt_Capital_One__OtherAsset__domain.txt", "prompt_bytes": 2855, "kind": "domain"}
+{"time": 1780776057.785556, "event": "llm_start", "label": "Capital_One__OtherAsset__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2855, "timeout_seconds": 60}
+{"time": 1780776090.4014926, "event": "llm_done", "label": "Capital_One__OtherAsset__domain:domain", "exit_code": 0, "elapsed_seconds": 32.62, "output_bytes": 3302, "stderr_preview": ""}
+{"time": 1780776090.4056427, "event": "report_written", "target": "*.bluetarp.com", "report": "/root/auditor/work/reports/Capital_One__OtherAsset__domain.md", "report_bytes": 3302, "mode": "domain"}
+{"time": 1780776090.4066665, "event": "target_audit_done", "kind": "domain", "program": "Capital One", "target": "OtherAsset", "source": "*.bluetarp.com", "report": "/root/auditor/work/reports/Capital_One__OtherAsset__domain.md", "finished_at": 1780776090.4066541}
+{"time": 1780776090.4071138, "event": "target_selected", "program": "Capital One", "target": "OtherAsset", "target_type": "domain", "identifier": "*.capitalone.ca", "kind": "domain"}
+{"time": 1780776090.4084039, "event": "target_audit_start", "program": "Capital One", "target": "OtherAsset", "source": "*.capitalone.ca", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776090.4112236, "event": "prompt_written", "target": "*.capitalone.ca", "prompt": "/root/auditor/work/prompt_Capital_One__OtherAsset__domain.txt", "prompt_bytes": 2860, "kind": "domain"}
+{"time": 1780776090.4121516, "event": "llm_start", "label": "Capital_One__OtherAsset__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2860, "timeout_seconds": 60}
+{"time": 1780776118.07583, "event": "llm_done", "label": "Capital_One__OtherAsset__domain:domain", "exit_code": 0, "elapsed_seconds": 27.66, "output_bytes": 3305, "stderr_preview": ""}
+{"time": 1780776118.0773861, "event": "report_written", "target": "*.capitalone.ca", "report": "/root/auditor/work/reports/Capital_One__OtherAsset__domain.md", "report_bytes": 3305, "mode": "domain"}
+{"time": 1780776118.0787673, "event": "target_audit_done", "kind": "domain", "program": "Capital One", "target": "OtherAsset", "source": "*.capitalone.ca", "report": "/root/auditor/work/reports/Capital_One__OtherAsset__domain.md", "finished_at": 1780776118.0787547}
+{"time": 1780776118.079758, "event": "program_timeout_skip", "program": "Capital One", "elapsed_seconds": 60.49, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780776118.0800498, "event": "program_start", "program": "Hyatt Hotels", "program_id": "HackerOne:hyatt"}
+{"time": 1780776118.2341876, "event": "targets_fetched", "program": "Hyatt Hotels", "count": 63}
+{"time": 1780776118.2355576, "event": "target_selected", "program": "Hyatt Hotels", "target": "Cidr", "target_type": "cidr", "identifier": "140.95.0.0/16", "kind": "domain"}
+{"time": 1780776118.2360828, "event": "target_audit_start", "program": "Hyatt Hotels", "target": "Cidr", "source": "140.95.0.0/16", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776118.2384124, "event": "prompt_written", "target": "140.95.0.0/16", "prompt": "/root/auditor/work/prompt_Hyatt_Hotels__Cidr__domain.txt", "prompt_bytes": 3528, "kind": "domain"}
+{"time": 1780776118.239886, "event": "llm_start", "label": "Hyatt_Hotels__Cidr__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3528, "timeout_seconds": 60}
+{"time": 1780776143.7591767, "event": "llm_done", "label": "Hyatt_Hotels__Cidr__domain:domain", "exit_code": 0, "elapsed_seconds": 25.52, "output_bytes": 2571, "stderr_preview": ""}
+{"time": 1780776143.760483, "event": "report_written", "target": "140.95.0.0/16", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "report_bytes": 2571, "mode": "domain"}
+{"time": 1780776143.7619987, "event": "target_audit_done", "kind": "domain", "program": "Hyatt Hotels", "target": "Cidr", "source": "140.95.0.0/16", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "finished_at": 1780776143.7619889}
+{"time": 1780776143.763114, "event": "target_selected", "program": "Hyatt Hotels", "target": "Cidr", "target_type": "cidr", "identifier": "199.66.248.0/22", "kind": "domain"}
+{"time": 1780776143.763679, "event": "target_audit_start", "program": "Hyatt Hotels", "target": "Cidr", "source": "199.66.248.0/22", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776143.7650635, "event": "prompt_written", "target": "199.66.248.0/22", "prompt": "/root/auditor/work/prompt_Hyatt_Hotels__Cidr__domain.txt", "prompt_bytes": 3536, "kind": "domain"}
+{"time": 1780776143.766246, "event": "llm_start", "label": "Hyatt_Hotels__Cidr__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3536, "timeout_seconds": 60}
+{"time": 1780776174.023345, "event": "llm_done", "label": "Hyatt_Hotels__Cidr__domain:domain", "exit_code": 0, "elapsed_seconds": 30.26, "output_bytes": 2727, "stderr_preview": ""}
+{"time": 1780776174.0254512, "event": "report_written", "target": "199.66.248.0/22", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "report_bytes": 2727, "mode": "domain"}
+{"time": 1780776174.0263817, "event": "target_audit_done", "kind": "domain", "program": "Hyatt Hotels", "target": "Cidr", "source": "199.66.248.0/22", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "finished_at": 1780776174.0263722}
+{"time": 1780776174.0275161, "event": "target_selected", "program": "Hyatt Hotels", "target": "Cidr", "target_type": "cidr", "identifier": "213.139.133.32/28", "kind": "domain"}
+{"time": 1780776174.0300632, "event": "target_audit_start", "program": "Hyatt Hotels", "target": "Cidr", "source": "213.139.133.32/28", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780776174.0329978, "event": "prompt_written", "target": "213.139.133.32/28", "prompt": "/root/auditor/work/prompt_Hyatt_Hotels__Cidr__domain.txt", "prompt_bytes": 3544, "kind": "domain"}
+{"time": 1780776174.034709, "event": "llm_start", "label": "Hyatt_Hotels__Cidr__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3544, "timeout_seconds": 60}
+{"time": 1780776201.709021, "event": "llm_done", "label": "Hyatt_Hotels__Cidr__domain:domain", "exit_code": 0, "elapsed_seconds": 27.67, "output_bytes": 2900, "stderr_preview": ""}
+{"time": 1780776201.7116556, "event": "report_written", "target": "213.139.133.32/28", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "report_bytes": 2900, "mode": "domain"}
+{"time": 1780776201.712718, "event": "target_audit_done", "kind": "domain", "program": "Hyatt Hotels", "target": "Cidr", "source": "213.139.133.32/28", "report": "/root/auditor/work/reports/Hyatt_Hotels__Cidr__domain.md", "finished_at": 1780776201.7127028}
+{"time": 1780776201.7136226, "event": "program_timeout_skip", "program": "Hyatt Hotels", "elapsed_seconds": 83.63, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780776201.71413, "event": "agent_loop_done", "report_count": 8, "error_count": 0, "skipped_count": 0, "stopped": false}
+{"time": 1780778747.1596022, "event": "sap_tool_call", "tool": "auditor_stats", "arguments": {}}
+{"time": 1780778747.1620746, "event": "sap_tool_call", "tool": "missing", "arguments": {}}
+{"time": 1780779835.1834915, "event": "sap_tool_call", "tool": "auditor_stats", "arguments": {}}
+{"time": 1780779835.1840167, "event": "sap_tool_call", "tool": "auditor_stats", "arguments": {}}
+{"time": 1780779835.1842444, "event": "sap_payment_unverified", "tool": "auditor_stats", "has_x402": true, "has_escrow": false}
+{"time": 1780779918.950889, "event": "agent_loop_start", "page": 1, "page_size": 3, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60, "ccr_cmd": "claude -p --setting-sources project,local"}
+{"time": 1780779920.4914613, "event": "programs_fetched", "count": 3}
+{"time": 1780779920.4920435, "event": "program_start", "program": "Anduril Industries", "program_id": "HackerOne:anduril_industries"}
+{"time": 1780779920.6863549, "event": "targets_fetched", "program": "Anduril Industries", "count": 8}
+{"time": 1780779920.687371, "event": "target_selected", "program": "Anduril Industries", "target": "Wildcard", "target_type": "domain", "identifier": "*.anduril.au", "kind": "domain"}
+{"time": 1780779920.6880205, "event": "target_audit_start", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.au", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780779920.6891494, "event": "prompt_written", "target": "*.anduril.au", "prompt": "/root/auditor/work/prompt_Anduril_Industries__Wildcard__domain.txt", "prompt_bytes": 3662, "kind": "domain"}
+{"time": 1780779920.6904705, "event": "llm_start", "label": "Anduril_Industries__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3662, "timeout_seconds": 60}
+{"time": 1780779944.1518202, "event": "llm_done", "label": "Anduril_Industries__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 23.46, "output_bytes": 2947, "stderr_preview": ""}
+{"time": 1780779944.1541893, "event": "report_written", "target": "*.anduril.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "report_bytes": 2947, "mode": "domain"}
+{"time": 1780779944.1548834, "event": "target_audit_done", "kind": "domain", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "finished_at": 1780779944.1548703}
+{"time": 1780779944.1555057, "event": "target_selected", "program": "Anduril Industries", "target": "Wildcard", "target_type": "domain", "identifier": "*.anduril.com", "kind": "domain"}
+{"time": 1780779944.1561365, "event": "target_audit_start", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780779944.1586204, "event": "prompt_written", "target": "*.anduril.com", "prompt": "/root/auditor/work/prompt_Anduril_Industries__Wildcard__domain.txt", "prompt_bytes": 3667, "kind": "domain"}
+{"time": 1780779944.159933, "event": "llm_start", "label": "Anduril_Industries__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3667, "timeout_seconds": 60}
+{"time": 1780779983.477561, "event": "llm_done", "label": "Anduril_Industries__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 39.32, "output_bytes": 3201, "stderr_preview": ""}
+{"time": 1780779983.478865, "event": "report_written", "target": "*.anduril.com", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "report_bytes": 3201, "mode": "domain"}
+{"time": 1780779983.480042, "event": "target_audit_done", "kind": "domain", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "finished_at": 1780779983.48003}
+{"time": 1780779983.48056, "event": "program_timeout_skip", "program": "Anduril Industries", "elapsed_seconds": 62.99, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780779983.4811857, "event": "program_start", "program": "Concrete CMS", "program_id": "HackerOne:concretecms"}
+{"time": 1780779983.6583757, "event": "targets_fetched", "program": "Concrete CMS", "count": 4}
+{"time": 1780779983.659277, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concrete5.org", "kind": "domain"}
+{"time": 1780779983.6600914, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concrete5.org", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780779983.6614916, "event": "prompt_written", "target": "*.concrete5.org", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4397, "kind": "domain"}
+{"time": 1780779983.662339, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4397, "timeout_seconds": 60}
