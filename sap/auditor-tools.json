@@ -18,19 +18,19 @@
     ],
     "capabilities": [
       {
-        "id": "audit.launch",
+        "id": "audit:launch",
         "description": "Launch a bounded bug bounty domain audit run.",
         "protocolId": "bug-bounty-audit",
         "version": "1.0.0"
       },
       {
-        "id": "audit.stats",
+        "id": "audit:stats",
         "description": "Read current run state, reports, errors, skips, and trace data.",
         "protocolId": "bug-bounty-audit",
         "version": "1.0.0"
       },
       {
-        "id": "audit.stop",
+        "id": "audit:stop",
         "description": "Request the current audit loop to stop.",
         "protocolId": "bug-bounty-audit",
         "version": "1.0.0"

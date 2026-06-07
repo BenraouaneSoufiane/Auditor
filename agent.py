@@ -423,19 +423,19 @@ SAP_AGENT_PROFILE = {
     ],
     "capabilities": [
         {
-            "id": "audit.launch",
+            "id": "audit:launch",
             "description": "Launch a bounded bug bounty domain audit run.",
             "protocol_id": "bug-bounty-audit",
             "version": "1.0.0",
         },
         {
-            "id": "audit.stats",
+            "id": "audit:stats",
             "description": "Read current run state, reports, errors, skips, and trace data.",
             "protocol_id": "bug-bounty-audit",
             "version": "1.0.0",
         },
         {
-            "id": "audit.stop",
+            "id": "audit:stop",
             "description": "Request the current audit loop to stop.",
             "protocol_id": "bug-bounty-audit",
             "version": "1.0.0",
@@ -534,8 +534,13 @@ async def verify_sap_payment(request: Request, tool_name: str):
 
     payment_header = request.headers.get("x-payment") or request.headers.get("x402-payment")
     escrow_header = request.headers.get("x-sap-escrow")
-    if not payment_header and not escrow_header:
-        return payment_required_response(tool_name, "Missing x402 payment or SAP escrow receipt header.")
+    x_payment_headers = {
+        key: value
+        for key, value in request.headers.items()
+        if key.lower().startswith("x-payment-")
+    }
+    if not payment_header and not escrow_header and not x_payment_headers:
+        return payment_required_response(tool_name, "Missing SAP x402 payment headers.")
 
     if not SAP_PAYMENT_VERIFY_URL:
         if SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS:
@@ -550,6 +555,8 @@ async def verify_sap_payment(request: Request, tool_name: str):
         "tool": tool_name,
         "price_per_call_lamports": SAP_PRICE_PER_CALL_LAMPORTS,
         "min_escrow_deposit_lamports": SAP_MIN_ESCROW_DEPOSIT_LAMPORTS,
+        "calls_to_settle": 1,
+        "headers": x_payment_headers,
         "x_payment": payment_header,
         "sap_escrow": escrow_header,
     }

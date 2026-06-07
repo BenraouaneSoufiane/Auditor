@@ -1,32 +1,27 @@
-# Quick Domain Audit: *.anduril.com
+# Quick Domain Audit: *.anduril.com.au
 
 ## Verdict
-Needs Manual Review
+Potential Critical/High hypothesis — wildcard scope on a defense contractor's Australian infrastructure with high bounty ceiling ($7,500) and critical CVSS classification warrants immediate manual reconnaissance.
 
 ## Top Attack Hypotheses
 
-- **Subdomain takeover** — wildcard scope on a defense-tech company likely means many subdomains with heterogeneous infrastructure (marketing sites, dev/staging, API gateways), increasing the chance of dangling CNAMEs or stale cloud resources (impact: full domain hijack, phishing stem).
-
-- **Authentication/SSO misconfiguration** — large enterprises federating across `*.anduril.com` subdomains often expose misconfigured OAuth callbacks, open redirects, or SAML assertion issues (impact: account takeover across corporate apps).
-
-- **Exposed internal tooling on subdomains** — rapid-growing defense contractors frequently spin up Jira, Grafana, Jenkins, or internal APIs on subdomains without proper access controls (impact: sensitive data leak, intellectual property exposure).
-
-- **API endpoint on unlisted subdomain** — wildcard scope combined with 6 in-scope targets suggests asset inventory may be incomplete; enumeration may reveal pre-production or forgotten APIs (impact: unauthorized data access, business logic abuse).
-
-- **TLS/SSL misconfiguration on secondary subdomains** — long-tail subdomains in wildcard scopes often have expired, misissued, or weak TLS configs (impact: MITM, credential interception, compliance violation).
+- **Subdomain takeover via dangling DNS records** — the wildcard scope covers all subdomains; stale CNAME pointers to decommissioned cloud services (S3, Azure, Heroku) could yield full domain hijack with critical impact on a defense contractor.
+- **Authentication bypass on internal-facing portals** — Australian regional infrastructure often exposes HR portals, VPN endpoints, or employee self-service apps that may lack SSO enforcement, leading to account takeover and potential lateral movement.
+- **Exposed .git directories or debug endpoints on staging/dev subdomains** — wildcard scope means any forgotten dev/staging subdomain is in-scope; these frequently leak source code, secrets, or API keys.
+- **Misconfigured CORS or API on unauthenticated subdomains** — defense contractors often run separate marketing/career sites on the same wildcard; a permissive CORS policy on any could enable cross-origin data exfiltration.
+- **Email spoofing via missing/dangling SPF/DKIM/DMARC on *.anduril.com.au** — the Australian domain may have weaker email hardening than the primary .com, enabling phishing that impersonates Anduril to partners or government contacts.
 
 ## Fast Checks
 
-1. **Subdomain enumeration** — run `subfinder -d anduril.com`, `amass enum -d anduril.com`, and certificate transparency log lookups (`crt.sh/?q=%.anduril.com`) to build a full subdomain inventory.
-2. **Dangling CNAME detection** — resolve all discovered subdomains and check for CNAMEs pointing to decommissioned S3 buckets, Azure Traffic Manager, GitHub Pages, Heroku, or other takeover-prone services.
-3. **HTTP prober + screenshot** — use `httpx -l subs.txt -sc -cl -title -screenshot` to identify live hosts, status codes, and page types; flag anything unexpected (login portals, dashboards, swagger UI).
-4. **Port scan high-value hosts** — `nmap -sV --top-ports 1000` on any discovered API, staging, or internal-looking subdomains to find unprotected services.
-5. **Content discovery on interesting subdomains** — `ffuf` or `feroxbuster` against any login/admin/API endpoints found for hidden paths, `.git/`, `.env`, swagger docs, or debug panels.
+1. **Subdomain enumeration** — run `subfinder -d anduril.com.au`, `amass enum -d anduril.com.au`, and crt.sh lookup to map the full attack surface.
+2. **Dangling CNAME detection** — resolve all discovered subdomains and check for NXDOMAIN responses on CNAME targets (classic takeover vector).
+3. **Port scan top 100 ports** on all live hosts — look for unusual services (8443, 9090, 5985/5986 WinRM) on non-production hosts.
+4. **HTTP probe + screenshot** — use `httpx` + `aquatone` to identify login portals, admin panels, and exposed frameworks; flag anything returning 401/403 for deeper auth testing.
+5. **DNSSEC/SPF/DKIM/DMARC audit** — check `dig TXT anduril.com.au` and `dig MX` for missing or misconfigured email authentication records.
 
 ## Notes
 
-- This audit is based **solely on program metadata** — no live reconnaissance or tool output was consulted.
-- Anduril Industries is a **defense/national security contractor**; their bug bounty likely has stricter responsible disclosure expectations and potentially narrower de facto scope despite the wildcard inclusion.
-- **High competition risk (Medium)** and **1,191 reports in 90 days** indicate heavy researcher activity; easy/obvious findings are likely already claimed. Differentiate by focusing on less-obvious subdomains and business-logic flaws rather than low-hanging web vulns.
-- Bounty range $50–$7,500 is strong; Critical-severity findings on defense-tech infrastructure could command top payouts.
-- Scope includes 6 in-scope targets (6 wildcard) and 2 out-of-scope — verify any discovered subdomain isn't explicitly excluded before testing.
+- **High competition**: 1,191 reports in 90 days suggests the surface has been heavily tested; low-hanging fruit is likely exhausted, but new subdomains or recent infrastructure changes remain viable.
+- **Scope is wildcard and bounty-eligible** — all subdomains of anduril.com.au are in scope with payouts, but verify the HackerOne policy for any excluded asset types (e.g., social media accounts, third-party SaaS).
+- **No live testing performed** — this audit is metadata-only; all hypotheses must be validated through authorized testing per the program's rules.
+- **Australian entity considerations** — .com.au domains have strict registrant eligibility requirements; the infrastructure may be managed separately from the primary anduril.com, potentially with different security maturity.

@@ -1,0 +1,102 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+*.dev.travix.com
+
+Program:
+{
+  "handle": "trip_com",
+  "name": "Trip.com",
+  "date_launched": "2023-10-17",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/j9y38pp759dqj4m3i9l1cqwksuqy/3f1ab5c6a9b6dadada1e6c8121700b884388bd0a43471fee1897a38ce57d0b2c",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/trip_com",
+  "report_count": 284,
+  "last_updated": "2026-06-06T21:04:18Z",
+  "targets_updated_at": "2026-05-07T12:53:33Z",
+  "bounty_min": 50,
+  "bounty_max": 1000,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:trip_com",
+  "added_at": "2023-10-17T00:00:00Z",
+  "extra_data": {
+    "report_count": 284,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "wildcard",
+    "mobile",
+    "other"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 21,
+    "in_scope": 17,
+    "out_of_scope": 4,
+    "eligible_for_bounty": 16,
+    "wildcard": 17
+  },
+  "target_activity": {
+    "latest_change_at": null,
+    "latest_added_at": "2026-05-07T12:53:33Z",
+    "added_24h": 0,
+    "added_7d": 0,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from high public report count, mature program, less obvious asset type."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "*.dev.travix.com",
+  "display_name": "Wildcard",
+  "normalized_identifier": "*.dev.travix.com",
+  "in_scope": false,
+  "wildcard": true,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "none",
+    "base_domain": "dev.travix.com",
+    "display_name": "Wildcard"
+  },
+  "source_url": "https://hackerone.com/trip_com/policy_scopes?type=team",
+  "added_at": "2026-05-07T12:53:33Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-06T21:04:18Z",
+  "eligible_for_bounty": false,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true
+}
+
+Return exactly this structure:
+# Quick Domain Audit: *.dev.travix.com
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

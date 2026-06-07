@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "sap:register": "tsx scripts/register-sap-tools.ts",
+    "sap:check-rpc": "tsx scripts/check-rpc.ts",
+    "sap:verify-payment": "tsx scripts/payment-verifier.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

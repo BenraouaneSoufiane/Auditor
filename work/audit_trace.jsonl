@@ -96,3 +96,121 @@
 {"time": 1780779983.6600914, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concrete5.org", "kind": "domain", "timeout_seconds": 60}
 {"time": 1780779983.6614916, "event": "prompt_written", "target": "*.concrete5.org", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4397, "kind": "domain"}
 {"time": 1780779983.662339, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4397, "timeout_seconds": 60}
+{"time": 1780780013.8955333, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 30.23, "output_bytes": 2617, "stderr_preview": ""}
+{"time": 1780780013.8969755, "event": "report_written", "target": "*.concrete5.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 2617, "mode": "domain"}
+{"time": 1780780013.8988335, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concrete5.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780013.898822}
+{"time": 1780780013.8991296, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concretecms.com", "kind": "domain"}
+{"time": 1780780013.8996615, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780013.9015746, "event": "prompt_written", "target": "*.concretecms.com", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4407, "kind": "domain"}
+{"time": 1780780013.902096, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4407, "timeout_seconds": 60}
+{"time": 1780780039.655633, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 25.75, "output_bytes": 2901, "stderr_preview": ""}
+{"time": 1780780039.6568418, "event": "report_written", "target": "*.concretecms.com", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 2901, "mode": "domain"}
+{"time": 1780780039.6587858, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.com", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780039.6587744}
+{"time": 1780780039.6590776, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concretecms.org", "kind": "domain"}
+{"time": 1780780039.6608443, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.org", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780039.6645772, "event": "prompt_written", "target": "*.concretecms.org", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4407, "kind": "domain"}
+{"time": 1780780039.6650753, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4407, "timeout_seconds": 60}
+{"time": 1780780061.3022501, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 21.64, "output_bytes": 2900, "stderr_preview": ""}
+{"time": 1780780061.304828, "event": "report_written", "target": "*.concretecms.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 2900, "mode": "domain"}
+{"time": 1780780061.3056421, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780061.3056257}
+{"time": 1780780061.3065283, "event": "program_timeout_skip", "program": "Concrete CMS", "elapsed_seconds": 77.83, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780780061.3073776, "event": "program_start", "program": "Trip.com", "program_id": "HackerOne:trip_com"}
+{"time": 1780780061.5013902, "event": "targets_fetched", "program": "Trip.com", "count": 21}
+{"time": 1780780061.5024872, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.budgetair.com", "kind": "domain"}
+{"time": 1780780061.5030086, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.budgetair.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780061.5041084, "event": "prompt_written", "target": "*.budgetair.com", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 3629, "kind": "domain"}
+{"time": 1780780061.5054111, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3629, "timeout_seconds": 60}
+{"time": 1780780086.886444, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 25.38, "output_bytes": 3041, "stderr_preview": ""}
+{"time": 1780780086.888878, "event": "report_written", "target": "*.budgetair.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 3041, "mode": "domain"}
+{"time": 1780780086.8899953, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.budgetair.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780086.8899817}
+{"time": 1780780086.8907638, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.cheaptickets.nl", "kind": "domain"}
+{"time": 1780780086.8921134, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.cheaptickets.nl", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780086.8932261, "event": "prompt_written", "target": "*.cheaptickets.nl", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 3639, "kind": "domain"}
+{"time": 1780780086.9012918, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3639, "timeout_seconds": 60}
+{"time": 1780780110.146223, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 23.24, "output_bytes": 2536, "stderr_preview": ""}
+{"time": 1780780110.1477823, "event": "report_written", "target": "*.cheaptickets.nl", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 2536, "mode": "domain"}
+{"time": 1780780110.1494887, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.cheaptickets.nl", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780110.1494775}
+{"time": 1780780110.1505435, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.dev.travix.com", "kind": "domain"}
+{"time": 1780780110.1510332, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.dev.travix.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780110.1527789, "event": "prompt_written", "target": "*.dev.travix.com", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 2810, "kind": "domain"}
+{"time": 1780780110.1571298, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2810, "timeout_seconds": 60}
+{"time": 1780780136.667757, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 26.51, "output_bytes": 3288, "stderr_preview": ""}
+{"time": 1780780136.6691077, "event": "report_written", "target": "*.dev.travix.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 3288, "mode": "domain"}
+{"time": 1780780136.6707976, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.dev.travix.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780136.6707847}
+{"time": 1780780136.6711786, "event": "program_timeout_skip", "program": "Trip.com", "elapsed_seconds": 75.36, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780780136.671803, "event": "agent_loop_done", "report_count": 8, "error_count": 0, "skipped_count": 0, "stopped": false}
+{"time": 1780780261.190766, "event": "agent_loop_start", "page": 1, "page_size": 3, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60, "ccr_cmd": "claude -p --setting-sources project,local"}
+{"time": 1780780261.4407349, "event": "programs_fetched", "count": 3}
+{"time": 1780780261.4416811, "event": "program_start", "program": "Anduril Industries", "program_id": "HackerOne:anduril_industries"}
+{"time": 1780780261.6438434, "event": "targets_fetched", "program": "Anduril Industries", "count": 8}
+{"time": 1780780261.644892, "event": "target_selected", "program": "Anduril Industries", "target": "Wildcard", "target_type": "domain", "identifier": "*.anduril.au", "kind": "domain"}
+{"time": 1780780261.6455972, "event": "target_audit_start", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.au", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780261.6475928, "event": "prompt_written", "target": "*.anduril.au", "prompt": "/root/auditor/work/prompt_Anduril_Industries__Wildcard__domain.txt", "prompt_bytes": 3661, "kind": "domain"}
+{"time": 1780780261.6488497, "event": "llm_start", "label": "Anduril_Industries__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3661, "timeout_seconds": 60}
+{"time": 1780780284.3621802, "event": "llm_done", "label": "Anduril_Industries__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 22.71, "output_bytes": 3108, "stderr_preview": ""}
+{"time": 1780780284.3661332, "event": "report_written", "target": "*.anduril.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "report_bytes": 3108, "mode": "domain"}
+{"time": 1780780284.3686404, "event": "target_audit_done", "kind": "domain", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "finished_at": 1780780284.3686297}
+{"time": 1780780284.3697307, "event": "target_selected", "program": "Anduril Industries", "target": "Wildcard", "target_type": "domain", "identifier": "*.anduril.com", "kind": "domain"}
+{"time": 1780780284.3710651, "event": "target_audit_start", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780284.3763285, "event": "prompt_written", "target": "*.anduril.com", "prompt": "/root/auditor/work/prompt_Anduril_Industries__Wildcard__domain.txt", "prompt_bytes": 3666, "kind": "domain"}
+{"time": 1780780284.3794668, "event": "llm_start", "label": "Anduril_Industries__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3666, "timeout_seconds": 60}
+{"time": 1780780315.5288498, "event": "llm_done", "label": "Anduril_Industries__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 31.15, "output_bytes": 3065, "stderr_preview": ""}
+{"time": 1780780315.5299964, "event": "report_written", "target": "*.anduril.com", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "report_bytes": 3065, "mode": "domain"}
+{"time": 1780780315.5314696, "event": "target_audit_done", "kind": "domain", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "finished_at": 1780780315.531458}
+{"time": 1780780315.5317733, "event": "target_selected", "program": "Anduril Industries", "target": "Wildcard", "target_type": "domain", "identifier": "*.anduril.com.au", "kind": "domain"}
+{"time": 1780780315.5321376, "event": "target_audit_start", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com.au", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780315.5347605, "event": "prompt_written", "target": "*.anduril.com.au", "prompt": "/root/auditor/work/prompt_Anduril_Industries__Wildcard__domain.txt", "prompt_bytes": 3681, "kind": "domain"}
+{"time": 1780780315.5361845, "event": "llm_start", "label": "Anduril_Industries__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3681, "timeout_seconds": 60}
+{"time": 1780780342.4492478, "event": "llm_done", "label": "Anduril_Industries__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 26.91, "output_bytes": 3048, "stderr_preview": ""}
+{"time": 1780780342.4512272, "event": "report_written", "target": "*.anduril.com.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "report_bytes": 3048, "mode": "domain"}
+{"time": 1780780342.4525902, "event": "target_audit_done", "kind": "domain", "program": "Anduril Industries", "target": "Wildcard", "source": "*.anduril.com.au", "report": "/root/auditor/work/reports/Anduril_Industries__Wildcard__domain.md", "finished_at": 1780780342.4525788}
+{"time": 1780780342.4531686, "event": "program_timeout_skip", "program": "Anduril Industries", "elapsed_seconds": 81.01, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780780342.453953, "event": "program_start", "program": "Concrete CMS", "program_id": "HackerOne:concretecms"}
+{"time": 1780780342.6502147, "event": "targets_fetched", "program": "Concrete CMS", "count": 4}
+{"time": 1780780342.6512759, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concrete5.org", "kind": "domain"}
+{"time": 1780780342.651891, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concrete5.org", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780342.653496, "event": "prompt_written", "target": "*.concrete5.org", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4397, "kind": "domain"}
+{"time": 1780780342.6543725, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4397, "timeout_seconds": 60}
+{"time": 1780780368.0432353, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 25.39, "output_bytes": 3066, "stderr_preview": ""}
+{"time": 1780780368.045252, "event": "report_written", "target": "*.concrete5.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 3066, "mode": "domain"}
+{"time": 1780780368.0455692, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concrete5.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780368.0455577}
+{"time": 1780780368.046557, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concretecms.com", "kind": "domain"}
+{"time": 1780780368.046956, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780368.04833, "event": "prompt_written", "target": "*.concretecms.com", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4407, "kind": "domain"}
+{"time": 1780780368.0497556, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4407, "timeout_seconds": 60}
+{"time": 1780780395.4997008, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 27.45, "output_bytes": 3183, "stderr_preview": ""}
+{"time": 1780780395.5022662, "event": "report_written", "target": "*.concretecms.com", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 3183, "mode": "domain"}
+{"time": 1780780395.5027192, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.com", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780395.5027072}
+{"time": 1780780395.5029998, "event": "target_selected", "program": "Concrete CMS", "target": "Wildcard", "target_type": "domain", "identifier": "*.concretecms.org", "kind": "domain"}
+{"time": 1780780395.5041604, "event": "target_audit_start", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.org", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780395.5068946, "event": "prompt_written", "target": "*.concretecms.org", "prompt": "/root/auditor/work/prompt_Concrete_CMS__Wildcard__domain.txt", "prompt_bytes": 4407, "kind": "domain"}
+{"time": 1780780395.5079496, "event": "llm_start", "label": "Concrete_CMS__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 4407, "timeout_seconds": 60}
+{"time": 1780780422.7628608, "event": "llm_done", "label": "Concrete_CMS__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 27.25, "output_bytes": 2882, "stderr_preview": ""}
+{"time": 1780780422.765383, "event": "report_written", "target": "*.concretecms.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "report_bytes": 2882, "mode": "domain"}
+{"time": 1780780422.7662768, "event": "target_audit_done", "kind": "domain", "program": "Concrete CMS", "target": "Wildcard", "source": "*.concretecms.org", "report": "/root/auditor/work/reports/Concrete_CMS__Wildcard__domain.md", "finished_at": 1780780422.766264}
+{"time": 1780780422.766766, "event": "program_timeout_skip", "program": "Concrete CMS", "elapsed_seconds": 80.31, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780780422.7670124, "event": "program_start", "program": "Trip.com", "program_id": "HackerOne:trip_com"}
+{"time": 1780780422.972998, "event": "targets_fetched", "program": "Trip.com", "count": 21}
+{"time": 1780780422.973383, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.budgetair.com", "kind": "domain"}
+{"time": 1780780422.9744284, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.budgetair.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780422.9801972, "event": "prompt_written", "target": "*.budgetair.com", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 3629, "kind": "domain"}
+{"time": 1780780422.981187, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3629, "timeout_seconds": 60}
+{"time": 1780780449.5013714, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 26.52, "output_bytes": 3333, "stderr_preview": ""}
+{"time": 1780780449.5035412, "event": "report_written", "target": "*.budgetair.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 3333, "mode": "domain"}
+{"time": 1780780449.5038314, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.budgetair.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780449.5038188}
+{"time": 1780780449.5046096, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.cheaptickets.nl", "kind": "domain"}
+{"time": 1780780449.5055418, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.cheaptickets.nl", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780449.5072231, "event": "prompt_written", "target": "*.cheaptickets.nl", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 3639, "kind": "domain"}
+{"time": 1780780449.5086346, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3639, "timeout_seconds": 60}
+{"time": 1780780472.7758036, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 23.27, "output_bytes": 2663, "stderr_preview": ""}
+{"time": 1780780472.7771282, "event": "report_written", "target": "*.cheaptickets.nl", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 2663, "mode": "domain"}
+{"time": 1780780472.778804, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.cheaptickets.nl", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780472.778791}
+{"time": 1780780472.7791693, "event": "target_selected", "program": "Trip.com", "target": "Wildcard", "target_type": "domain", "identifier": "*.dev.travix.com", "kind": "domain"}
+{"time": 1780780472.779729, "event": "target_audit_start", "program": "Trip.com", "target": "Wildcard", "source": "*.dev.travix.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1780780472.7819846, "event": "prompt_written", "target": "*.dev.travix.com", "prompt": "/root/auditor/work/prompt_Trip.com__Wildcard__domain.txt", "prompt_bytes": 2810, "kind": "domain"}
+{"time": 1780780472.7829802, "event": "llm_start", "label": "Trip.com__Wildcard__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2810, "timeout_seconds": 60}
+{"time": 1780780498.7325568, "event": "llm_done", "label": "Trip.com__Wildcard__domain:domain", "exit_code": 0, "elapsed_seconds": 25.95, "output_bytes": 3288, "stderr_preview": ""}
+{"time": 1780780498.7341342, "event": "report_written", "target": "*.dev.travix.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "report_bytes": 3288, "mode": "domain"}
+{"time": 1780780498.7353663, "event": "target_audit_done", "kind": "domain", "program": "Trip.com", "target": "Wildcard", "source": "*.dev.travix.com", "report": "/root/auditor/work/reports/Trip.com__Wildcard__domain.md", "finished_at": 1780780498.7353523}
+{"time": 1780780498.7358224, "event": "program_timeout_skip", "program": "Trip.com", "elapsed_seconds": 75.97, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1780780498.736517, "event": "agent_loop_done", "report_count": 9, "error_count": 0, "skipped_count": 0, "stopped": false}
