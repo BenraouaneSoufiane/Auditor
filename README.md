@@ -207,8 +207,9 @@ The interactive dashboard allows you to:
 **SAP Tools:**
 
 1. **`auditor_launch`** - Launch a bounded audit run with custom parameters
-2. **`auditor_stats`** - Read current run state, reports, errors, and trace data
+2. **`auditor_stats`** - Read the paid caller's current run state and report IDs
 3. **`auditor_stop`** - Request the current audit loop to stop
+4. **`auditor_get_report`** - Retrieve a generated report owned by the paid caller
 
 ### Example: Launch via API
 
@@ -374,6 +375,35 @@ SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS=true
 
 Do not use unverified receipts in production.
 
+### Paid Report Access
+
+SAP payment gates each tool call. Reports are scoped to the payer wallet from `X-Payment-Depositor`:
+
+1. Call `auditor_launch` with valid SAP-x402 headers.
+2. Poll `auditor_stats` with valid SAP-x402 headers from the same depositor wallet.
+3. Read `reports[*].report_id` from the stats response.
+4. Call `auditor_get_report` with the same depositor wallet and the `report_id`.
+
+Example:
+
+```bash
+curl -X POST https://audits.click/sap/tools/auditor_get_report \
+  -H "Content-Type: application/json" \
+  -H "X-Payment-Protocol: SAP-x402" \
+  -H "X-Payment-Escrow: <escrow_pda>" \
+  -H "X-Payment-Agent: 5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7" \
+  -H "X-Payment-Depositor: <caller_wallet>" \
+  -H "X-Payment-MaxCalls: <funded_call_allowance>" \
+  -H "X-Payment-PricePerCall: 1000" \
+  -H "X-Payment-Program: SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ" \
+  -H "X-Payment-Network: solana:mainnet-beta" \
+  -d '{"arguments":{"report_id":"report_..."}}'
+```
+
+The public `/stats` endpoint remains a dashboard/debug endpoint. Paid SAP callers should use `/sap/tools/auditor_stats` and `/sap/tools/auditor_get_report`.
+
+Paid report ownership is persisted in `work/report_access.json` so completed report access survives agent restarts.
+
 ## SAP Registration
 
 The repository includes TypeScript helpers for Synapse Agent Protocol registration.
@@ -421,6 +451,8 @@ Current mainnet addresses from the completed registration:
 | `auditor_launch` tool | `FJQiKzXxHB3Px9kioeitfvNPQYuZq1GFxhH99c2i2HAi` |
 | `auditor_stats` tool | `Fkj5GaRbzv9a6vTFRCPHz7pw8yz6QmohkbsgjpZNrSjZ` |
 | `auditor_stop` tool | `GtR3j1P3sHf4rojJRa4gm61SYpbnZujq1pW3PnxT4NWm` |
+
+After adding new tools, rerun `npm run sap:register`. Existing tools are skipped; only missing tools are published.
 
 ### RPC Diagnostics
 

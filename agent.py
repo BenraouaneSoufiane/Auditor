@@ -1,4 +1,4 @@
-import os, re, json, time, signal, shutil, asyncio, logging, shlex
+import os, re, json, time, signal, shutil, asyncio, logging, shlex, uuid
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlparse
@@ -22,6 +22,7 @@ WORKDIR = Path(os.getenv("WORKDIR", "./work")).resolve()
 REPORTS = WORKDIR / "reports"
 REPOS = WORKDIR / "repos"
 CONTRACTS = WORKDIR / "contracts"
+REPORT_ACCESS_FILE = WORKDIR / "report_access.json"
 AGENT_BASE_URL = os.getenv("AGENT_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 SAP_REQUIRE_PAYMENT = os.getenv("SAP_REQUIRE_PAYMENT", "true").lower() not in {"0", "false", "no", "off"}
 SAP_PAYMENT_VERIFY_URL = os.getenv("SAP_PAYMENT_VERIFY_URL", "").strip()
@@ -388,11 +389,14 @@ state = {
     "stop": False,
     "current": None,
     "reports": [],
+    "report_access": {},
     "errors": [],
     "skipped": [],
     "explorer_debug": [],
     "trace": [],
     "started_at": None,
+    "active_run_id": None,
+    "active_owner_wallet": None,
 }
 
 
@@ -437,6 +441,12 @@ SAP_AGENT_PROFILE = {
         {
             "id": "audit:stop",
             "description": "Request the current audit loop to stop.",
+            "protocol_id": "bug-bounty-audit",
+            "version": "1.0.0",
+        },
+        {
+            "id": "audit:report",
+            "description": "Retrieve a completed report owned by the paid caller.",
             "protocol_id": "bug-bounty-audit",
             "version": "1.0.0",
         },
@@ -502,11 +512,59 @@ SAP_TOOLS = [
             "properties": {"status": {"type": "string"}},
         },
     },
+    {
+        "name": "auditor_get_report",
+        "protocol": "bug-bounty-audit",
+        "description": "Return a generated audit report only to the paid caller that owns it.",
+        "category": "Analytics",
+        "method": "POST",
+        "path": "/sap/tools/auditor_get_report",
+        "params_count": 1,
+        "required_params": 1,
+        "input_schema": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["report_id"],
+            "properties": {
+                "report_id": {"type": "string"},
+            },
+        },
+        "output_schema": {
+            "type": "object",
+            "properties": {
+                "report_id": {"type": "string"},
+                "content": {"type": "string"},
+                "metadata": {"type": "object"},
+                "error": {"type": "string"},
+            },
+        },
+    },
 ]
 
 
 class SapToolCall(BaseModel):
     arguments: dict[str, Any] = {}
+
+
+def load_report_access():
+    try:
+        if REPORT_ACCESS_FILE.exists():
+            data = json.loads(REPORT_ACCESS_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                state["report_access"] = data
+    except Exception as e:
+        logger.warning("failed to load report access file: %s", e)
+
+
+def save_report_access():
+    try:
+        WORKDIR.mkdir(exist_ok=True)
+        REPORT_ACCESS_FILE.write_text(json.dumps(state["report_access"], indent=2), encoding="utf-8")
+    except Exception as e:
+        logger.warning("failed to save report access file: %s", e)
+
+
+load_report_access()
 
 
 def payment_required_response(tool_name: str, detail: str):
@@ -545,7 +603,11 @@ async def verify_sap_payment(request: Request, tool_name: str):
     if not SAP_PAYMENT_VERIFY_URL:
         if SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS:
             trace("sap_payment_unverified", tool=tool_name, has_x402=bool(payment_header), has_escrow=bool(escrow_header))
-            return None
+            return {
+                "verified": False,
+                "depositor_wallet": x_payment_headers.get("x-payment-depositor"),
+                "escrow_pda": x_payment_headers.get("x-payment-escrow") or escrow_header,
+            }
         return payment_required_response(
             tool_name,
             "Payment receipt supplied, but SAP_PAYMENT_VERIFY_URL is not configured for verification.",
@@ -564,8 +626,19 @@ async def verify_sap_payment(request: Request, tool_name: str):
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(SAP_PAYMENT_VERIFY_URL, json=payload)
         if response.status_code // 100 == 2:
-            trace("sap_payment_verified", tool=tool_name, verifier=SAP_PAYMENT_VERIFY_URL)
-            return None
+            data = response.json()
+            trace(
+                "sap_payment_verified",
+                tool=tool_name,
+                verifier=SAP_PAYMENT_VERIFY_URL,
+                depositor_wallet=data.get("depositorWallet"),
+                escrow_pda=data.get("escrowPda"),
+            )
+            return {
+                "verified": True,
+                "depositor_wallet": data.get("depositorWallet") or x_payment_headers.get("x-payment-depositor"),
+                "escrow_pda": data.get("escrowPda") or x_payment_headers.get("x-payment-escrow"),
+            }
         return payment_required_response(tool_name, f"Payment verifier rejected receipt with HTTP {response.status_code}.")
     except Exception as e:
         return payment_required_response(tool_name, f"Payment verification failed: {e}")
@@ -1254,6 +1327,9 @@ Generated as a timeout fallback after {audit_timeout_seconds} seconds.
     )
 
     result = {
+        "report_id": f"report_{uuid.uuid4().hex[:16]}",
+        "run_id": state.get("active_run_id"),
+        "owner_wallet": state.get("active_owner_wallet"),
         "kind": "domain",
         "program": program.get("name") or program_name,
         "target": target.get("display_name") or target_name,
@@ -1262,14 +1338,24 @@ Generated as a timeout fallback after {audit_timeout_seconds} seconds.
         "finished_at": time.time(),
     }
     state["reports"].append(result)
+    if result["owner_wallet"]:
+        state["report_access"][result["report_id"]] = {
+            "owner_wallet": result["owner_wallet"],
+            "run_id": result["run_id"],
+            "report": result["report"],
+            "metadata": {k: v for k, v in result.items() if k != "report"},
+        }
+        save_report_access()
     trace("target_audit_done", **result)
     return result
 
 
-async def agent_loop(req: LaunchRequest):
+async def agent_loop(req: LaunchRequest, run_id: Optional[str] = None, owner_wallet: Optional[str] = None):
     state["running"] = True
     state["stop"] = False
     state["started_at"] = time.time()
+    state["active_run_id"] = run_id
+    state["active_owner_wallet"] = owner_wallet
     state["errors"] = []
     state["reports"] = []
     state["skipped"] = []
@@ -1284,6 +1370,8 @@ async def agent_loop(req: LaunchRequest):
         audit_timeout_seconds=req.audit_timeout_seconds,
         program_timeout_seconds=req.program_timeout_seconds,
         ccr_cmd=CCR_CMD,
+        run_id=run_id,
+        owner_wallet=owner_wallet,
     )
 
     WORKDIR.mkdir(exist_ok=True)
@@ -1383,6 +1471,8 @@ async def agent_loop(req: LaunchRequest):
         )
         state["running"] = False
         state["current"] = None
+        state["active_run_id"] = None
+        state["active_owner_wallet"] = None
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1409,6 +1499,93 @@ def sap_manifest():
     }
 
 
+def public_report_metadata(report: dict):
+    return {
+        "report_id": report.get("report_id"),
+        "run_id": report.get("run_id"),
+        "program": report.get("program"),
+        "target": report.get("target"),
+        "source": report.get("source"),
+        "kind": report.get("kind"),
+        "finished_at": report.get("finished_at"),
+    }
+
+
+def paid_stats(owner_wallet: Optional[str]):
+    if not owner_wallet:
+        return {"error": "Payment verifier did not return depositor wallet; cannot scope paid report access."}
+
+    reports_by_id = {}
+    for report_id, access in state["report_access"].items():
+        if access.get("owner_wallet") == owner_wallet:
+            metadata = access.get("metadata", {})
+            reports_by_id[report_id] = {
+                **public_report_metadata(metadata),
+                "report_id": report_id,
+            }
+    for report in state["reports"]:
+        if report.get("owner_wallet") == owner_wallet:
+            reports_by_id[report["report_id"]] = public_report_metadata(report)
+
+    return {
+        "running": state["running"],
+        "current": state["current"],
+        "started_at": state["started_at"],
+        "owner_wallet": owner_wallet,
+        "reports": sorted(reports_by_id.values(), key=lambda item: item.get("finished_at") or 0, reverse=True),
+        "errors": state["errors"],
+        "skipped": state["skipped"],
+        "active_run_id": state.get("active_run_id") if state.get("active_owner_wallet") == owner_wallet else None,
+    }
+
+
+async def paid_launch(req: LaunchRequest, owner_wallet: Optional[str]):
+    if not owner_wallet:
+        return {"error": "Payment verifier did not return depositor wallet; cannot create paid run."}
+    if not BBRADAR_TOKEN:
+        return {"error": "Missing BBRADAR_TOKEN env var"}
+    if state["running"]:
+        return {"status": "already_running", "current": state["current"]}
+
+    run_id = f"run_{uuid.uuid4().hex[:16]}"
+    asyncio.create_task(agent_loop(req, run_id=run_id, owner_wallet=owner_wallet))
+    return {
+        "status": "launched",
+        "run_id": run_id,
+        "owner_wallet": owner_wallet,
+        "page": req.page,
+        "page_size": req.page_size,
+    }
+
+
+def paid_report(report_id: str, owner_wallet: Optional[str]):
+    if not owner_wallet:
+        return {"error": "Payment verifier did not return depositor wallet; cannot read paid report."}
+
+    access = state["report_access"].get(report_id)
+    if not access or access.get("owner_wallet") != owner_wallet:
+        return JSONResponse(
+            status_code=403,
+            content={"error": "report_not_found_or_not_owned", "report_id": report_id},
+        )
+
+    report_path = Path(access["report"]).resolve()
+    try:
+        report_path.relative_to(REPORTS.resolve())
+    except ValueError:
+        return JSONResponse(status_code=403, content={"error": "invalid_report_path", "report_id": report_id})
+
+    if not report_path.exists():
+        return JSONResponse(status_code=404, content={"error": "report_file_missing", "report_id": report_id})
+
+    return {
+        "report_id": report_id,
+        "owner_wallet": owner_wallet,
+        "metadata": access.get("metadata", {}),
+        "content": report_path.read_text(encoding="utf-8"),
+    }
+
+
 @app.get("/sap/agent")
 async def sap_agent():
     return sap_manifest()["agent"]
@@ -1428,16 +1605,24 @@ async def sap_manifest_route():
 async def sap_tool_call(tool_name: str, call: SapToolCall, request: Request):
     trace("sap_tool_call", tool=tool_name, arguments=call.arguments)
 
-    payment_error = await verify_sap_payment(request, tool_name)
-    if payment_error:
-        return payment_error
+    payment = await verify_sap_payment(request, tool_name)
+    if isinstance(payment, JSONResponse):
+        return payment
+    owner_wallet = payment.get("depositor_wallet") if isinstance(payment, dict) else None
+    if not owner_wallet and not SAP_REQUIRE_PAYMENT:
+        owner_wallet = "local-dev"
 
     if tool_name == "auditor_launch":
-        return await launch(LaunchRequest(**call.arguments))
+        return await paid_launch(LaunchRequest(**call.arguments), owner_wallet)
     if tool_name == "auditor_stats":
-        return await stats()
+        return paid_stats(owner_wallet)
     if tool_name == "auditor_stop":
         return await stop()
+    if tool_name == "auditor_get_report":
+        report_id = str(call.arguments.get("report_id") or "")
+        if not report_id:
+            return JSONResponse(status_code=422, content={"error": "Missing report_id"})
+        return paid_report(report_id, owner_wallet)
 
     return {"error": f"Unknown SAP tool: {tool_name}"}
 

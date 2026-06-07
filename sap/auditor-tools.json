@@ -34,6 +34,12 @@
         "description": "Request the current audit loop to stop.",
         "protocolId": "bug-bounty-audit",
         "version": "1.0.0"
+      },
+      {
+        "id": "audit:report",
+        "description": "Retrieve a completed report owned by the paid caller.",
+        "protocolId": "bug-bounty-audit",
+        "version": "1.0.0"
       }
     ]
   },
@@ -93,6 +99,33 @@
       "outputSchema": {
         "type": "object",
         "properties": { "status": { "type": "string" } }
+      }
+    },
+    {
+      "name": "auditor_get_report",
+      "protocol": "bug-bounty-audit",
+      "description": "Return a generated audit report only to the paid caller that owns it.",
+      "category": 8,
+      "httpMethod": 1,
+      "paramsCount": 1,
+      "requiredParams": 1,
+      "isCompound": false,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["report_id"],
+        "properties": {
+          "report_id": { "type": "string" }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": { "type": "string" },
+          "content": { "type": "string" },
+          "metadata": { "type": "object" },
+          "error": { "type": "string" }
+        }
       }
     }
   ]
