@@ -49,6 +49,7 @@ The agent looks for:
 - **Python 3.10+**
 - **Claude CLI** (CCR - Claude Command Runner) running locally or via Anthropic
 - **Node.js 18+** (for SAP registration)
+- **PM2** (optional, for production process management)
 - API keys for blockchain explorers (optional but recommended):
   - Etherscan API key
   - Basescan API key
@@ -89,6 +90,7 @@ AGENT_BASE_URL=http://127.0.0.1:8000
 
 # SAP (Synapse Agent Protocol) payment settings
 SAP_REQUIRE_PAYMENT=false
+SAP_PAYMENT_VERIFY_URL=http://127.0.0.1:8787/verify
 SAP_PRICE_PER_CALL_LAMPORTS=1000
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS=10000
 EOF
@@ -110,17 +112,60 @@ npm install
 yarn install
 ```
 
+Install PM2 globally if you want the production commands below:
+
+```bash
+npm install -g pm2
+```
+
 ## Usage
 
 ### Running the Agent
 
-Start the FastAPI server:
+Start the FastAPI server with Uvicorn:
 
 ```bash
-python agent.py
+source .venv/bin/activate
+uvicorn agent:app --host 127.0.0.1 --port 8000
 ```
 
 The agent will be available at `http://127.0.0.1:8000`.
+
+### Running with PM2
+
+PM2 can keep the FastAPI agent and the SAP payment verifier running in the background.
+
+Start the agent:
+
+```bash
+cd /root/auditor
+
+BBRADAR_TOKEN="your_bbradar_api_token" \
+CCR_CMD="claude -p --setting-sources project,local" \
+AGENT_BASE_URL="https://audits.click" \
+SAP_REQUIRE_PAYMENT=true \
+SAP_PAYMENT_VERIFY_URL="http://127.0.0.1:8787/verify" \
+SAP_PRICE_PER_CALL_LAMPORTS=1000 \
+SAP_MIN_ESCROW_DEPOSIT_LAMPORTS=10000 \
+pm2 start .venv/bin/uvicorn --name auditor-agent -- agent:app --host 127.0.0.1 --port 8000
+```
+
+If your public domain terminates TLS through nginx/Caddy, proxy `https://audits.click` to `127.0.0.1:8000`.
+
+Check and manage the process:
+
+```bash
+pm2 status
+pm2 logs auditor-agent
+pm2 restart auditor-agent --update-env
+```
+
+Persist PM2 after reboot:
+
+```bash
+pm2 save
+pm2 startup
+```
 
 #### Web Dashboard
 
@@ -277,6 +322,116 @@ To disable payment requirements, set:
 ```bash
 SAP_REQUIRE_PAYMENT=false
 ```
+
+### SAP Payment Verifier
+
+The verifier is a local HTTP service that validates SAP-x402 escrow headers using the Synapse SAP SDK. The FastAPI agent calls it through `SAP_PAYMENT_VERIFY_URL` before executing any SAP tool.
+
+Start it with PM2:
+
+```bash
+cd /root/auditor
+
+SAP_RPC_URL="https://api.mainnet-beta.solana.com" \
+SAP_AGENT_PDA="5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7" \
+SAP_PRICE_PER_CALL_LAMPORTS=1000 \
+SAP_PAYMENT_VERIFIER_PORT=8787 \
+pm2 start npm --name sap-payment-verifier -- run sap:verify-payment
+```
+
+Health check:
+
+```bash
+curl http://127.0.0.1:8787/health
+pm2 logs sap-payment-verifier
+```
+
+Configure the agent to use it:
+
+```bash
+SAP_REQUIRE_PAYMENT=true
+SAP_PAYMENT_VERIFY_URL="http://127.0.0.1:8787/verify"
+```
+
+SAP-x402 callers must include these headers when calling `/sap/tools/{tool_name}`:
+
+```http
+X-Payment-Protocol: SAP-x402
+X-Payment-Escrow: <escrow_pda>
+X-Payment-Agent: 5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7
+X-Payment-Depositor: <caller_wallet>
+X-Payment-MaxCalls: <funded_call_allowance>
+X-Payment-PricePerCall: 1000
+X-Payment-Program: SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ
+X-Payment-Network: solana:mainnet-beta
+```
+
+For local testing only, you can bypass real verification:
+
+```bash
+SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS=true
+```
+
+Do not use unverified receipts in production.
+
+## SAP Registration
+
+The repository includes TypeScript helpers for Synapse Agent Protocol registration.
+
+### Wallet
+
+Generate or provide a Solana keypair and fund it with enough SOL for account rent and transaction fees:
+
+```bash
+export SAP_KEYPAIR_PATH="/root/auditor/.sap-keypair-mainnet.json"
+```
+
+Print the wallet address:
+
+```bash
+node -e "const {Keypair}=require('@solana/web3.js');const fs=require('fs');const kp=Keypair.fromSecretKey(Uint8Array.from(JSON.parse(fs.readFileSync(process.env.SAP_KEYPAIR_PATH,'utf8'))));console.log(kp.publicKey.toBase58())"
+```
+
+### Register Agent and Tools
+
+Use a standard Solana mainnet RPC for registration:
+
+```bash
+export SAP_KEYPAIR_PATH="/root/auditor/.sap-keypair-mainnet.json"
+export SAP_RPC_URL="https://api.mainnet-beta.solana.com"
+export AGENT_BASE_URL="https://audits.click"
+unset SAP_INSCRIBE_SCHEMAS
+
+npm run sap:register
+```
+
+The registration script writes a summary to:
+
+```bash
+work/sap-registration.json
+```
+
+Current mainnet addresses from the completed registration:
+
+| Item | Address |
+|------|---------|
+| Wallet | `6ZTMVhTK5i1dphmrdCHMgbtKhy9roPSsoesPEt9oPXRA` |
+| Agent PDA | `5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7` |
+| Agent Stats PDA | `FMLQkvTu29gikNYDybKcT4Qz2oeASnQckj15qfyunM5B` |
+| `auditor_launch` tool | `FJQiKzXxHB3Px9kioeitfvNPQYuZq1GFxhH99c2i2HAi` |
+| `auditor_stats` tool | `Fkj5GaRbzv9a6vTFRCPHz7pw8yz6QmohkbsgjpZNrSjZ` |
+| `auditor_stop` tool | `GtR3j1P3sHf4rojJRa4gm61SYpbnZujq1pW3PnxT4NWm` |
+
+### RPC Diagnostics
+
+Check whether an RPC endpoint supports the methods needed by SAP registration:
+
+```bash
+export SAP_RPC_URL="https://api.mainnet-beta.solana.com"
+npm run sap:check-rpc
+```
+
+The OOBE staging endpoint may serve some methods but not all standard Solana JSON-RPC methods. If it fails on `getAccountInfo` or `sendTransaction`, use a standard Solana mainnet RPC provider for registration.
 
 ## Integration with OOBE-PROTOCOL
 
