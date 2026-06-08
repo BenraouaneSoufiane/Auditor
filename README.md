@@ -412,6 +412,7 @@ cd /root/auditor
 
 SAP_RPC_URL="https://api.mainnet-beta.solana.com" \
 SAP_AGENT_PDA="5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7" \
+SAP_AGENT_KEYPAIR_PATH="/root/auditor/.sap-agent-keypair-mainnet.json" \
 SAP_PRICE_PER_CALL_LAMPORTS=1000 \
 SAP_PAYMENT_VERIFIER_PORT=8787 \
 pm2 start npm --name sap-payment-verifier -- run sap:verify-payment
@@ -429,7 +430,11 @@ Configure the agent to use it:
 ```bash
 SAP_REQUIRE_PAYMENT=true
 SAP_PAYMENT_VERIFY_URL="http://127.0.0.1:8787/verify"
+# Optional; defaults to the same base URL with /settle.
+SAP_PAYMENT_SETTLE_URL="http://127.0.0.1:8787/settle"
 ```
+
+The verifier exposes `/verify` for read-only escrow validation and `/settle` for the signed on-chain `settleCallsV2` transaction. Set `SAP_AGENT_KEYPAIR_PATH`, `SAP_SETTLEMENT_KEYPAIR_PATH`, or `ANCHOR_WALLET` for settlement signing. For local verification-only testing, set `SAP_SETTLEMENT_REQUIRED=false`.
 
 SAP-x402 callers must include these headers when calling `/sap/tools/{tool_name}`:
 
@@ -438,6 +443,7 @@ X-Payment-Protocol: SAP-x402
 X-Payment-Escrow: <escrow_pda>
 X-Payment-Agent: 5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7
 X-Payment-Depositor: <caller_wallet>
+X-Payment-Escrow-Nonce: <escrow_nonce>
 X-Payment-MaxCalls: <funded_call_allowance>
 X-Payment-PricePerCall: 1000
 X-Payment-Program: SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ

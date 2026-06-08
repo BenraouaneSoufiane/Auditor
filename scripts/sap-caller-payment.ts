@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { randomInt } from "node:crypto";
 
-import { Connection, Keypair, PublicKey, SystemProgram, type TransactionInstruction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 
 type PaymentRequest = {
   agentWallet: string;
@@ -85,6 +85,69 @@ async function fetchEscrowV2(client: any, escrowPda: PublicKey) {
   }
 }
 
+async function fetchEscrow(client: any, escrowPda: PublicKey) {
+  try {
+    return await client.program.account.escrowAccount.fetch(escrowPda);
+  } catch {
+    const info = await client.connection.getAccountInfo(escrowPda);
+    if (!info) return null;
+    return decodeLegacyEscrow(info.data);
+  }
+}
+
+function readU64(data: Buffer, offset: number) {
+  return data.readBigUInt64LE(offset).toString();
+}
+
+function readI64(data: Buffer, offset: number) {
+  return data.readBigInt64LE(offset).toString();
+}
+
+function decodeLegacyEscrow(data: Buffer) {
+  if (data.subarray(0, 8).toString("hex") !== "2445301280e17d87") return null;
+  let offset = 8;
+  const bump = data.readUInt8(offset);
+  offset += 1;
+  const agent = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const depositor = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const agentWallet = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const balance = readU64(data, offset);
+  offset += 8;
+  const totalDeposited = readU64(data, offset);
+  offset += 8;
+  const totalSettled = readU64(data, offset);
+  offset += 8;
+  const totalCallsSettled = readU64(data, offset);
+  offset += 8;
+  const pricePerCall = readU64(data, offset);
+  offset += 8;
+  const maxCalls = readU64(data, offset);
+  offset += 8;
+  const createdAt = readI64(data, offset);
+  offset += 8;
+  const lastSettledAt = readI64(data, offset);
+  offset += 8;
+  const expiresAt = readI64(data, offset);
+  return {
+    bump,
+    agent,
+    depositor,
+    agentWallet,
+    balance,
+    totalDeposited,
+    totalSettled,
+    totalCallsSettled,
+    pricePerCall,
+    maxCalls,
+    createdAt,
+    lastSettledAt,
+    expiresAt,
+  };
+}
+
 function derivePricingMenu(agentPda: PublicKey, programId: PublicKey) {
   return PublicKey.findProgramAddressSync([Buffer.from("sap_pricing"), agentPda.toBuffer()], programId);
 }
@@ -92,6 +155,24 @@ function derivePricingMenu(agentPda: PublicKey, programId: PublicKey) {
 function u64Le(value: number) {
   const buffer = Buffer.alloc(8);
   buffer.writeBigUInt64LE(BigInt(value));
+  return buffer;
+}
+
+function bnU64Le(value: any) {
+  const buffer = Buffer.alloc(8);
+  buffer.writeBigUInt64LE(BigInt(value.toString()));
+  return buffer;
+}
+
+function i64Le(value: number) {
+  const buffer = Buffer.alloc(8);
+  buffer.writeBigInt64LE(BigInt(value));
+  return buffer;
+}
+
+function u32Le(value: number) {
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32LE(value);
   return buffer;
 }
 
@@ -108,6 +189,65 @@ function deriveEscrowV2(agentPda: PublicKey, depositor: PublicKey, escrowNonce: 
     depositor.toBuffer(),
     u64Le(escrowNonce),
   ], programId);
+}
+
+function deriveEscrow(agentPda: PublicKey, depositor: PublicKey, programId: PublicKey) {
+  return PublicKey.findProgramAddressSync([
+    Buffer.from("sap_escrow"),
+    agentPda.toBuffer(),
+    depositor.toBuffer(),
+  ], programId);
+}
+
+function createEscrowInstruction(accounts: {
+  depositor: PublicKey;
+  agent: PublicKey;
+  escrow: PublicKey;
+  systemProgram: PublicKey;
+}, args: {
+  pricePerCall: any;
+  maxCalls: any;
+  initialDeposit: any;
+  programId: PublicKey;
+}) {
+  return new TransactionInstruction({
+    programId: args.programId,
+    keys: [
+      { pubkey: accounts.depositor, isSigner: true, isWritable: true },
+      { pubkey: accounts.agent, isSigner: false, isWritable: false },
+      { pubkey: accounts.escrow, isSigner: false, isWritable: true },
+      { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.concat([
+      Buffer.from("fdd7a574246c4450", "hex"),
+      bnU64Le(args.pricePerCall),
+      bnU64Le(args.maxCalls),
+      bnU64Le(args.initialDeposit),
+      i64Le(0),
+      u32Le(0),
+      Buffer.from([0, 9]),
+    ]),
+  });
+}
+
+function depositEscrowInstruction(accounts: {
+  depositor: PublicKey;
+  escrow: PublicKey;
+  systemProgram: PublicKey;
+  programId: PublicKey;
+}, amount: any) {
+  return new TransactionInstruction({
+    programId: accounts.programId,
+    keys: [
+      { pubkey: accounts.depositor, isSigner: true, isWritable: true },
+      { pubkey: accounts.escrow, isSigner: false, isWritable: true },
+      { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.concat([
+      Buffer.from("e2709eb0b2769980", "hex"),
+      bnU64Le(amount),
+    ]),
+  });
 }
 
 async function sendInstructions(client: any, signer: Keypair, instructions: any[]) {
@@ -164,6 +304,9 @@ async function main() {
   const rpcUrl = request.rpcUrl ?? process.env.SAP_RPC_URL ?? process.env.SYNAPSE_RPC_URL;
   const rpcApiKey = request.rpcApiKey ?? process.env.SAP_RPC_API_KEY ?? process.env.SYNAPSE_API_KEY;
   const keypairPath = request.keypairPath ?? process.env.SAP_KEYPAIR_PATH ?? process.env.ANCHOR_WALLET;
+  const useLegacyEscrow = !new Set(["0", "false", "no", "off"]).has(
+    (process.env.SAP_LEGACY_SETTLE_CALLS ?? "true").toLowerCase(),
+  );
   const network = request.network ?? process.env.SAP_PAYMENT_NETWORK ?? "solana:mainnet-beta";
   const calls = Math.max(1, Number(request.calls ?? 1));
   const maxCalls = Math.max(calls, Number(request.maxCalls ?? process.env.SAP_CALLER_MAX_CALLS ?? 20));
@@ -185,50 +328,69 @@ async function main() {
   const [agentPda] = Pdas.getAgentPDA(agentWallet);
   const [agentStatsPda] = Pdas.getAgentStatsPDA(agentPda);
   const [agentStakePda] = Pdas.getAgentStakePDA(agentPda);
-  const [escrowPda] = deriveEscrowV2(agentPda, signer.publicKey, escrowNonce, client.programId);
+  const [legacyEscrowPda] = deriveEscrow(agentPda, signer.publicKey, client.programId);
+  const [escrowV2Pda] = deriveEscrowV2(agentPda, signer.publicKey, escrowNonce, client.programId);
+  const escrowPda = useLegacyEscrow ? legacyEscrowPda : escrowV2Pda;
   const [pricingMenuPda] = derivePricingMenu(agentPda, client.programId);
   let action = "reuse";
   let txSignature: string | null = null;
-  let escrowBefore = await fetchEscrowV2(client, escrowPda);
+  let escrowBefore = useLegacyEscrow
+    ? await fetchEscrow(client, escrowPda)
+    : await fetchEscrowV2(client, escrowPda);
 
   if (request.forceCreate || !escrowBefore) {
     action = "create";
-    const instruction = await client.program.methods
-      .createEscrowV2(
-        new BN(escrowNonce),
-        pricePerCall,
-        new BN(maxCalls),
-        deposit,
-        new BN(0),
-        [],
-        null,
-        9,
-        0,
-        new BN(0),
-        null,
-        null,
-      )
-      .accounts({
-        depositor: signer.publicKey,
-        agent: agentPda,
-        agentStake: agentStakePda,
-        agentStats: agentStatsPda,
-        pricingMenu: pricingMenuPda,
-        escrow: escrowPda,
-        systemProgram: SystemProgram.programId,
-      })
-      .instruction();
-    txSignature = await sendInstructions(client, signer, [
-      reorderCreateEscrowV2ForDeployedProgram(instruction, {
-        depositor: signer.publicKey,
-        agent: agentPda,
-        escrow: escrowPda,
-        systemProgram: SystemProgram.programId,
-        agentStake: agentStakePda,
-        agentStats: agentStatsPda,
-        pricingMenu: pricingMenuPda,
-      }),
-    ]);
+    if (useLegacyEscrow) {
+      const instruction = createEscrowInstruction({
+          depositor: signer.publicKey,
+          agent: agentPda,
+          escrow: escrowPda,
+          systemProgram: SystemProgram.programId,
+        }, {
+          pricePerCall,
+          maxCalls: new BN(maxCalls),
+          initialDeposit: deposit,
+          programId: client.programId,
+        });
+      txSignature = await sendInstructions(client, signer, [instruction]);
+    } else {
+      const instruction = await client.program.methods
+        .createEscrowV2(
+          new BN(escrowNonce),
+          pricePerCall,
+          new BN(maxCalls),
+          deposit,
+          new BN(0),
+          [],
+          null,
+          9,
+          0,
+          new BN(0),
+          null,
+          null,
+        )
+        .accounts({
+          depositor: signer.publicKey,
+          agent: agentPda,
+          agentStake: agentStakePda,
+          agentStats: agentStatsPda,
+          pricingMenu: pricingMenuPda,
+          escrow: escrowPda,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+      txSignature = await sendInstructions(client, signer, [
+        reorderCreateEscrowV2ForDeployedProgram(instruction, {
+          depositor: signer.publicKey,
+          agent: agentPda,
+          escrow: escrowPda,
+          systemProgram: SystemProgram.programId,
+          agentStake: agentStakePda,
+          agentStats: agentStatsPda,
+          pricingMenu: pricingMenuPda,
+        }),
+      ]);
+    }
   } else {
     const before = escrowSummary(escrowBefore, pricePerCall);
     const affordableCalls = Number(before?.affordableCalls ?? 0);
@@ -242,19 +404,28 @@ async function main() {
       action = "top_up";
       const shortfallCalls = Math.max(calls - affordableCalls, 1);
       const topUp = BN.max(minDeposit, pricePerCall.mul(new BN(shortfallCalls)));
-      const instruction = await client.program.methods
-        .depositEscrowV2(new BN(escrowNonce), topUp)
-        .accounts({
-          depositor: signer.publicKey,
-          escrow: escrowPda,
-          systemProgram: SystemProgram.programId,
-        })
-        .instruction();
+      const instruction = useLegacyEscrow
+        ? depositEscrowInstruction({
+            depositor: signer.publicKey,
+            escrow: escrowPda,
+            systemProgram: SystemProgram.programId,
+            programId: client.programId,
+          }, topUp)
+        : await client.program.methods
+          .depositEscrowV2(new BN(escrowNonce), topUp)
+          .accounts({
+            depositor: signer.publicKey,
+            escrow: escrowPda,
+            systemProgram: SystemProgram.programId,
+          })
+          .instruction();
       txSignature = await sendInstructions(client, signer, [instruction]);
     }
   }
 
-  const escrowAfter = await fetchEscrowV2(client, escrowPda);
+  const escrowAfter = useLegacyEscrow
+    ? await fetchEscrow(client, escrowPda)
+    : await fetchEscrowV2(client, escrowPda);
   if (!escrowAfter) {
     throw new Error("Payment escrow was not available after create/top-up.");
   }
@@ -263,6 +434,7 @@ async function main() {
     "X-Payment-Escrow": escrowPda.toBase58(),
     "X-Payment-Agent": agentPda.toBase58(),
     "X-Payment-Depositor": signer.publicKey.toBase58(),
+    "X-Payment-Escrow-Nonce": useLegacyEscrow ? "0" : String(escrowNonce),
     "X-Payment-MaxCalls": escrowAfter.maxCalls.toString(),
     "X-Payment-PricePerCall": escrowAfter.pricePerCall.toString(),
     "X-Payment-Program": client.programId.toBase58(),
@@ -272,7 +444,8 @@ async function main() {
   console.log(JSON.stringify({
     action,
     txSignature,
-    escrowNonce,
+    escrowNonce: useLegacyEscrow ? 0 : escrowNonce,
+    escrowVersion: useLegacyEscrow ? 1 : 2,
     depositorWallet: signer.publicKey.toBase58(),
     headers,
     escrowPda: headers["X-Payment-Escrow"],

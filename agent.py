@@ -29,6 +29,7 @@ SAP_PAYMENT_VERIFY_URL = os.getenv("SAP_PAYMENT_VERIFY_URL", "").strip()
 SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS = (
     os.getenv("SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS", "false").lower() in {"1", "true", "yes", "on"}
 )
+SAP_PAYMENT_SETTLE_URL = os.getenv("SAP_PAYMENT_SETTLE_URL", "").strip()
 SAP_PRICE_PER_CALL_LAMPORTS = int(os.getenv("SAP_PRICE_PER_CALL_LAMPORTS", "1000"))
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS = int(os.getenv("SAP_MIN_ESCROW_DEPOSIT_LAMPORTS", "10000"))
 
@@ -586,6 +587,14 @@ def payment_required_response(tool_name: str, detail: str):
     )
 
 
+def sap_payment_settle_url() -> str:
+    if SAP_PAYMENT_SETTLE_URL:
+        return SAP_PAYMENT_SETTLE_URL
+    if SAP_PAYMENT_VERIFY_URL.endswith("/verify"):
+        return f"{SAP_PAYMENT_VERIFY_URL[:-len('/verify')]}/settle"
+    return SAP_PAYMENT_VERIFY_URL.rstrip("/") + "/settle"
+
+
 async def verify_sap_payment(request: Request, tool_name: str):
     if not SAP_REQUIRE_PAYMENT:
         return None
@@ -613,11 +622,13 @@ async def verify_sap_payment(request: Request, tool_name: str):
             "Payment receipt supplied, but SAP_PAYMENT_VERIFY_URL is not configured for verification.",
         )
 
+    settlement_service_id = f"{tool_name}:{uuid.uuid4().hex}"
     payload = {
         "tool": tool_name,
         "price_per_call_lamports": SAP_PRICE_PER_CALL_LAMPORTS,
         "min_escrow_deposit_lamports": SAP_MIN_ESCROW_DEPOSIT_LAMPORTS,
         "calls_to_settle": 1,
+        "settlement_service_id": settlement_service_id,
         "headers": x_payment_headers,
         "x_payment": payment_header,
         "sap_escrow": escrow_header,
@@ -625,21 +636,36 @@ async def verify_sap_payment(request: Request, tool_name: str):
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(SAP_PAYMENT_VERIFY_URL, json=payload)
-        if response.status_code // 100 == 2:
-            data = response.json()
+            if response.status_code // 100 == 2:
+                data = response.json()
+                settle_response = await client.post(sap_payment_settle_url(), json=payload)
+                if settle_response.status_code // 100 != 2:
+                    return payment_required_response(
+                        tool_name,
+                        f"Payment settlement failed with HTTP {settle_response.status_code}.",
+                    )
+                settlement = settle_response.json()
+            else:
+                return payment_required_response(tool_name, f"Payment verifier rejected receipt with HTTP {response.status_code}.")
             trace(
-                "sap_payment_verified",
+                "sap_payment_settled",
                 tool=tool_name,
                 verifier=SAP_PAYMENT_VERIFY_URL,
                 depositor_wallet=data.get("depositorWallet"),
                 escrow_pda=data.get("escrowPda"),
+                settlement_signature=settlement.get("signature"),
+                settlement_receipt=settlement.get("settlementReceipt"),
+                already_settled=settlement.get("alreadySettled"),
             )
             return {
                 "verified": True,
+                "settled": settlement.get("settled"),
+                "settlement_signature": settlement.get("signature"),
+                "settlement_receipt": settlement.get("settlementReceipt"),
+                "settlement_service_id": settlement_service_id,
                 "depositor_wallet": data.get("depositorWallet") or x_payment_headers.get("x-payment-depositor"),
                 "escrow_pda": data.get("escrowPda") or x_payment_headers.get("x-payment-escrow"),
             }
-        return payment_required_response(tool_name, f"Payment verifier rejected receipt with HTTP {response.status_code}.")
     except Exception as e:
         return payment_required_response(tool_name, f"Payment verification failed: {e}")
 
@@ -1605,6 +1631,12 @@ async def sap_manifest_route():
 async def sap_tool_call(tool_name: str, call: SapToolCall, request: Request):
     trace("sap_tool_call", tool=tool_name, arguments=call.arguments)
 
+    known_tools = {"auditor_launch", "auditor_stats", "auditor_stop", "auditor_get_report"}
+    if tool_name not in known_tools:
+        return JSONResponse(status_code=404, content={"error": f"Unknown SAP tool: {tool_name}"})
+    if tool_name == "auditor_get_report" and not str(call.arguments.get("report_id") or ""):
+        return JSONResponse(status_code=422, content={"error": "Missing report_id"})
+
     payment = await verify_sap_payment(request, tool_name)
     if isinstance(payment, JSONResponse):
         return payment
@@ -1620,11 +1652,9 @@ async def sap_tool_call(tool_name: str, call: SapToolCall, request: Request):
         return await stop()
     if tool_name == "auditor_get_report":
         report_id = str(call.arguments.get("report_id") or "")
-        if not report_id:
-            return JSONResponse(status_code=422, content={"error": "Missing report_id"})
         return paid_report(report_id, owner_wallet)
 
-    return {"error": f"Unknown SAP tool: {tool_name}"}
+    return JSONResponse(status_code=404, content={"error": f"Unknown SAP tool: {tool_name}"})
 
 
 @app.post("/launch")
