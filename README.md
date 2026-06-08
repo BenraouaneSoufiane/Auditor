@@ -238,15 +238,46 @@ This repo also includes a standalone Python caller app that pays with the existi
 Defaults are read from `.env`, `work/sap-registration.json`, and `.sap-keypair-mainnet.json` when present:
 
 ```bash
+source .venv/bin/activate
 python3 caller_agent.py tools
 python3 caller_agent.py serve --host 127.0.0.1 --port 8088
-python3 caller_agent.py launch --page 1 --page-size 3
 python3 caller_agent.py stats
 python3 caller_agent.py report report_<id>
 python3 caller_agent.py receipts
 ```
 
-The home page is available at `http://127.0.0.1:8088` and provides paid launch, stats, report retrieval, custom tool calls, and local receipt browsing.
+The home page is available at `http://127.0.0.1:8088` and provides automatic paid launch/status/stop, paid report retrieval, custom tool calls, and local receipt browsing. Launch parameters and automation timing are read from `.env`, not printed on the UI:
+
+```bash
+SAP_CALLER_AUTO_RUN=true
+SAP_CALLER_RUN_DURATION_SECONDS=30m
+SAP_CALLER_STATS_INTERVAL_SECONDS=2m
+SAP_CALLER_FRESH_ESCROW_PER_CALL=true
+SAP_CALLER_AUTO_FETCH_REPORTS=true
+
+SAP_CALLER_LAUNCH_PAGE=1
+SAP_CALLER_LAUNCH_PAGE_SIZE=3
+SAP_CALLER_LAUNCH_MAX_FILES_PER_TASK=80
+SAP_CALLER_LAUNCH_AUDIT_TIMEOUT_SECONDS=60
+SAP_CALLER_LAUNCH_PROGRAM_TIMEOUT_SECONDS=60
+```
+
+When `serve` starts and `SAP_CALLER_RUN_DURATION_SECONDS` is set, the caller automatically pays for `auditor_launch`, pays for `auditor_stats` at the configured interval, pays once to fetch each new unique report by program/target, then pays for `auditor_stop` when the duration elapses. `SAP_CALLER_FRESH_ESCROW_PER_CALL=true` creates a fresh escrow nonce for each call, so each launch, stats poll, report fetch, stop, or custom tool call submits a new on-chain transaction instead of reusing a prior payment transaction.
+
+Caller `.env` reference:
+
+| Variable | Purpose |
+|----------|---------|
+| `SAP_CALLER_AUTO_RUN` | Starts the automatic caller loop when `caller_agent.py serve` starts. |
+| `SAP_CALLER_RUN_DURATION_SECONDS` | Total run duration before the caller pays for `auditor_stop`; accepts values like `600`, `10m`, or `1h`. |
+| `SAP_CALLER_STATS_INTERVAL_SECONDS` | How often the caller pays for `auditor_stats`; accepts values like `120` or `2m`. |
+| `SAP_CALLER_FRESH_ESCROW_PER_CALL` | Creates a new escrow nonce per paid call so each action submits a new on-chain transaction. |
+| `SAP_CALLER_AUTO_FETCH_REPORTS` | After each stats call, pays once to fetch each new unique report by program/target. |
+| `SAP_CALLER_LAUNCH_PAGE` | Page passed to `auditor_launch`. |
+| `SAP_CALLER_LAUNCH_PAGE_SIZE` | Page size passed to `auditor_launch`. |
+| `SAP_CALLER_LAUNCH_MAX_FILES_PER_TASK` | Max files per audit task passed to `auditor_launch`. |
+| `SAP_CALLER_LAUNCH_AUDIT_TIMEOUT_SECONDS` | Per-audit timeout passed to `auditor_launch`. |
+| `SAP_CALLER_LAUNCH_PROGRAM_TIMEOUT_SECONDS` | Per-program timeout passed to `auditor_launch`. |
 
 To point at a local agent instead of the registered public URL:
 
@@ -260,7 +291,22 @@ For arbitrary paid SAP tool calls:
 python3 caller_agent.py call auditor_get_report --arg report_id=report_<id>
 ```
 
-The caller creates or tops up the SAP x402 escrow before each paid call by delegating payment/header construction to `scripts/sap-caller-payment.ts`. Receipts are appended to `work/caller_receipts.jsonl` and include the call ID, tool, HTTP status, escrow PDA, depositor wallet, payment transaction signature when a create/top-up occurred, and returned report IDs when available.
+The caller delegates payment/header construction to `scripts/sap-caller-payment.ts`. With the default `SAP_CALLER_FRESH_ESCROW_PER_CALL=true`, receipts are appended to `work/caller_receipts.jsonl` for each fresh paid call and include the call ID, tool, HTTP status, escrow PDA, escrow nonce, depositor wallet, payment transaction signature, and returned report IDs when available.
+
+To clear local caller/audit output and start fresh while keeping `.env`, keypairs, registration, and source code intact:
+
+```bash
+rm -f work/caller_receipts.jsonl
+rm -f work/audit_trace.jsonl
+rm -f work/report_access.json
+rm -rf work/reports/*
+rm -rf work/repos/*
+rm -rf work/contracts/*
+rm -rf work/debug/*
+rm -f work/prompt_*.txt
+```
+
+This only clears local history and generated artifacts. It does not undo any on-chain escrow accounts, transactions, or payments.
 
 ## Architecture
 

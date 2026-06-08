@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 import subprocess
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -74,7 +75,6 @@ HOME_HTML = """<!doctype html>
     header {
       display: flex;
       align-items: flex-end;
-      justify-content: space-between;
       gap: 18px;
       padding: 18px 0 24px;
       border-bottom: 1px solid var(--line);
@@ -82,15 +82,6 @@ HOME_HTML = """<!doctype html>
     h1, h2, h3, p { margin: 0; }
     h1 { font-size: clamp(1.9rem, 4vw, 3.2rem); line-height: 1; letter-spacing: 0; }
     header p { margin-top: 10px; color: var(--muted); line-height: 1.5; }
-    .status {
-      min-width: min(100%, 340px);
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      overflow-wrap: anywhere;
-    }
-    .status b { display: block; margin-bottom: 4px; color: var(--accent); font-size: 0.82rem; }
     .layout {
       display: grid;
       grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.35fr);
@@ -202,28 +193,17 @@ HOME_HTML = """<!doctype html>
     <header>
       <div>
         <h1>Auditor Caller</h1>
-        <p>Paid SAP tool caller with escrow payment, report access, and local receipt outlines.</p>
-      </div>
-      <div class="status">
-        <b>Configuration</b>
-        <span id="config">Loading...</span>
+        <p>Paid SAP tool caller with automatic launch, paid stats polling, timed stop, report access, and local receipt outlines.</p>
       </div>
     </header>
 
     <div class="layout">
       <section>
         <div class="block">
-          <h2>Launch Audit</h2>
-          <p class="hint">Starts a paid bounded run and records the receipt locally.</p>
-          <div class="grid">
-            <label>Page <input id="page" type="number" min="1" value="1"></label>
-            <label>Page size <input id="page_size" type="number" min="1" value="3"></label>
-            <label>Max files <input id="max_files_per_task" type="number" min="1" value="80"></label>
-            <label>Audit timeout <input id="audit_timeout_seconds" type="number" min="1" value="60"></label>
-            <label>Program timeout <input id="program_timeout_seconds" type="number" min="1" value="60"></label>
-          </div>
+          <h2>Automatic Run</h2>
+          <p class="hint">Launch, stats polling, and timed stop are controlled by environment variables.</p>
+          <pre class="output" id="automation">Loading...</pre>
           <div class="actions">
-            <button id="launch">Pay & Launch</button>
             <button class="secondary" id="stats">Pay & Refresh Stats</button>
           </div>
         </div>
@@ -313,29 +293,62 @@ HOME_HTML = """<!doctype html>
       button.textContent = busy ? "Working..." : button.dataset.originalText;
     }
 
+    function reportsFrom(value) {
+      const candidates = [
+        value?.body?.reports,
+        value?.body?.result?.reports,
+        value?.reports,
+        value?.result?.reports,
+        value?.response_body?.reports,
+        value?.response_body?.result?.reports,
+        value?.receipt?.response_body?.reports,
+      ];
+      return candidates.find(item => Array.isArray(item)) || [];
+    }
+
+    function reportKeyFor(report) {
+      const program = String(report?.program || "").trim().toLowerCase();
+      const target = String(report?.target || "").trim().toLowerCase();
+      return program || target ? `${program}::${target}` : String(report?.report_id || report?.id || "").trim();
+    }
+
     function renderReports(stats) {
       const target = $("reports");
-      const reports = Array.isArray(stats?.body?.reports) ? stats.body.reports : Array.isArray(stats?.reports) ? stats.reports : [];
+      const seen = new Set();
+      const reports = reportsFrom(stats).filter(report => {
+        const reportId = report?.report_id || report?.id || "";
+        const reportKey = reportKeyFor(report);
+        if (!reportId || seen.has(reportKey)) return false;
+        seen.add(reportKey);
+        return true;
+      });
       if (!reports.length) {
         target.innerHTML = '<div class="row"><span class="meta">No owned reports yet.</span></div>';
         return;
       }
       target.innerHTML = "";
       for (const report of reports) {
+        const reportId = report.report_id || report.id || "";
         const row = document.createElement("div");
         row.className = "row";
         const title = document.createElement("h3");
         title.textContent = `${report.program || "Program"} / ${report.target || "Target"}`;
         const meta = document.createElement("div");
         meta.className = "meta";
-        meta.textContent = report.report_id || "";
+        meta.textContent = reportId;
         const button = document.createElement("button");
         button.className = "secondary";
-        button.textContent = "Pay & Fetch Report";
-        button.onclick = () => fetchReport(report.report_id, button);
+        button.textContent = "View Report";
+        button.disabled = !reportId;
+        button.onclick = () => fetchReport(reportId, button);
         row.append(title, meta, button);
         target.append(row);
       }
+    }
+
+    function renderLatestStatsReports(receipts) {
+      const latestStats = receipts.slice().reverse().find(item => item.tool === "auditor_stats" && reportsFrom(item).length);
+      renderReports(latestStats || {});
     }
 
     function renderReceipts(receipts) {
@@ -362,13 +375,15 @@ HOME_HTML = """<!doctype html>
       }
     }
 
-    async function loadConfig() {
-      const config = await api("/api/config");
-      $("config").textContent = `${config.base_url} · ${config.network} · ${config.depositor_hint}`;
+    async function loadAutomation() {
+      const status = await api("/api/automation");
+      $("automation").textContent = JSON.stringify(status, null, 2);
     }
 
     async function refreshReceipts() {
-      renderReceipts(await api("/api/receipts"));
+      const receipts = await api("/api/receipts");
+      renderReceipts(receipts);
+      renderLatestStatsReports(receipts);
     }
 
     async function refreshStats(button = $("stats")) {
@@ -398,27 +413,6 @@ HOME_HTML = """<!doctype html>
       }
     }
 
-    $("launch").onclick = async event => {
-      const button = event.currentTarget;
-      setBusy(button, true);
-      const payload = {
-        page: Number($("page").value),
-        page_size: Number($("page_size").value),
-        max_files_per_task: Number($("max_files_per_task").value),
-        audit_timeout_seconds: Number($("audit_timeout_seconds").value),
-        program_timeout_seconds: Number($("program_timeout_seconds").value),
-      };
-      try {
-        const data = await api("/api/launch", { method: "POST", body: JSON.stringify(payload) });
-        showCallResult(data);
-        await refreshReceipts();
-      } catch (error) {
-        show(error);
-      } finally {
-        setBusy(button, false);
-      }
-    };
-
     $("stats").onclick = event => refreshStats(event.currentTarget);
     $("refresh-receipts").onclick = refreshReceipts;
 
@@ -441,8 +435,12 @@ HOME_HTML = """<!doctype html>
       }
     };
 
-    loadConfig().catch(show);
+    loadAutomation().catch(show);
     refreshReceipts().catch(show);
+    setInterval(() => {
+      loadAutomation().catch(show);
+      refreshReceipts().catch(show);
+    }, 10000);
   </script>
 </body>
 </html>
@@ -471,6 +469,53 @@ def read_receipts(path: Path) -> list[dict[str, Any]]:
     return receipts
 
 
+def reports_from_value(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, dict):
+        return []
+    candidates = [
+        value.get("reports"),
+        value.get("body", {}).get("reports") if isinstance(value.get("body"), dict) else None,
+        value.get("response_body", {}).get("reports") if isinstance(value.get("response_body"), dict) else None,
+    ]
+    for candidate in candidates:
+        if isinstance(candidate, list):
+            return [item for item in candidate if isinstance(item, dict)]
+    return []
+
+
+def report_key(report: dict[str, Any]) -> str:
+    program = str(report.get("program") or "").strip().lower()
+    target = str(report.get("target") or "").strip().lower()
+    if program or target:
+        return f"{program}::{target}"
+    return str(report.get("report_id") or report.get("id") or "").strip()
+
+
+def fetched_report_keys(receipts: list[dict[str, Any]]) -> set[str]:
+    keys: set[str] = set()
+    for receipt in receipts:
+        if receipt.get("tool") != "auditor_get_report" or not receipt.get("ok", True):
+            continue
+        body = receipt.get("response_body")
+        if not isinstance(body, dict):
+            continue
+        metadata = body.get("metadata") if isinstance(body.get("metadata"), dict) else {}
+        key = report_key({**metadata, "report_id": body.get("report_id")})
+        if key:
+            keys.add(key)
+    return keys
+
+
+def local_report(receipts: list[dict[str, Any]], report_id: str) -> dict[str, Any] | None:
+    for receipt in reversed(receipts):
+        if receipt.get("tool") != "auditor_get_report" or not receipt.get("ok", True):
+            continue
+        body = receipt.get("response_body")
+        if isinstance(body, dict) and str(body.get("report_id") or "") == report_id:
+            return {"receipt": receipt, "body": body}
+    return None
+
+
 def parse_kv(items: list[str]) -> dict[str, Any]:
     parsed: dict[str, Any] = {}
     for item in items:
@@ -495,6 +540,49 @@ def merge_arguments(json_payload: str | None, kv_args: list[str]) -> dict[str, A
     return payload
 
 
+def truthy_env(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    return int(value)
+
+
+def env_duration_seconds(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    raw = value.strip().lower()
+    multiplier = 1
+    if raw.endswith("ms"):
+        return max(1, int(float(raw[:-2]) / 1000))
+    if raw.endswith("s"):
+        raw = raw[:-1]
+    elif raw.endswith("m"):
+        raw = raw[:-1]
+        multiplier = 60
+    elif raw.endswith("h"):
+        raw = raw[:-1]
+        multiplier = 3600
+    return int(float(raw) * multiplier)
+
+
+def launch_args_from_env() -> dict[str, int]:
+    return {
+        "page": env_int("SAP_CALLER_LAUNCH_PAGE", 1),
+        "page_size": env_int("SAP_CALLER_LAUNCH_PAGE_SIZE", 3),
+        "max_files_per_task": env_int("SAP_CALLER_LAUNCH_MAX_FILES_PER_TASK", 80),
+        "audit_timeout_seconds": env_duration_seconds("SAP_CALLER_LAUNCH_AUDIT_TIMEOUT_SECONDS", 60),
+        "program_timeout_seconds": env_duration_seconds("SAP_CALLER_LAUNCH_PROGRAM_TIMEOUT_SECONDS", 60),
+    }
+
+
 class CallerAgent:
     def __init__(self, args: argparse.Namespace) -> None:
         load_dotenv(ROOT / ".env")
@@ -511,6 +599,7 @@ class CallerAgent:
         self.min_escrow_deposit = str(args.min_escrow_deposit or os.getenv("SAP_MIN_ESCROW_DEPOSIT_LAMPORTS") or "10000")
         self.session_calls = int(args.session_calls or os.getenv("SAP_CALLER_MAX_CALLS") or self.manifest_session_calls() or 20)
         self.timeout = args.timeout
+        self.fresh_escrow_per_call = truthy_env("SAP_CALLER_FRESH_ESCROW_PER_CALL", True)
 
         if not self.keypair_path and DEFAULT_KEYPAIR.exists():
             self.keypair_path = str(DEFAULT_KEYPAIR)
@@ -556,6 +645,7 @@ class CallerAgent:
             "calls": calls,
             "maxCalls": self.session_calls,
             "forceCreate": force_create,
+            "freshEscrow": self.fresh_escrow_per_call or force_create,
         }
         env = os.environ.copy()
         env["SAP_CALLER_PAYMENT_REQUEST"] = json.dumps(request)
@@ -609,6 +699,7 @@ class CallerAgent:
                 "network": payment.get("network"),
                 "price_per_call_lamports": payment.get("pricePerCallLamports"),
                 "max_calls": payment.get("maxCalls"),
+                "escrow_nonce": payment.get("escrowNonce"),
                 "balance_after": payment.get("balanceAfter"),
             },
             "response_summary": summarize_response(body),
@@ -624,6 +715,103 @@ class CallerAgent:
         if "application/json" not in headers.get("content-type", ""):
             raise SystemExit(f"GET {path} did not return JSON: {text[:500]}")
         return json.loads(text)
+
+
+class AutoCaller:
+    def __init__(self, caller: CallerAgent) -> None:
+        self.caller = caller
+        self.enabled = truthy_env("SAP_CALLER_AUTO_RUN", True)
+        self.duration_seconds = env_duration_seconds("SAP_CALLER_RUN_DURATION_SECONDS", 0)
+        self.stats_interval_seconds = env_duration_seconds("SAP_CALLER_STATS_INTERVAL_SECONDS", 120)
+        self.launch_arguments = launch_args_from_env()
+        self.auto_fetch_reports = truthy_env("SAP_CALLER_AUTO_FETCH_REPORTS", True)
+        self.fetched_report_keys = fetched_report_keys(read_receipts(caller.receipts_path))
+        self.started_at: float | None = None
+        self.ends_at: float | None = None
+        self.stopped_at: float | None = None
+        self.last_action: str | None = None
+        self.last_result: dict[str, Any] | None = None
+        self.error: str | None = None
+        self.thread: threading.Thread | None = None
+        self.lock = threading.Lock()
+        self.stop_event = threading.Event()
+
+    def start(self) -> None:
+        if not self.enabled or self.thread:
+            return
+        self.thread = threading.Thread(target=self.run, name="caller-auto-run", daemon=True)
+        self.thread.start()
+
+    def snapshot(self) -> dict[str, Any]:
+        with self.lock:
+            return {
+                "enabled": self.enabled,
+                "running": bool(self.thread and self.thread.is_alive() and not self.stopped_at),
+                "started_at": self.started_at,
+                "ends_at": self.ends_at,
+                "stopped_at": self.stopped_at,
+                "last_action": self.last_action,
+                "last_result": self.last_result,
+                "error": self.error,
+            }
+
+    def record(self, action: str, result: dict[str, Any] | None = None, error: Exception | None = None) -> None:
+        with self.lock:
+            self.last_action = action
+            if result is not None:
+                self.last_result = summarize_response(result.get("body"))
+                self.error = None
+            if error is not None:
+                self.error = str(error)
+
+    def paid_call(self, tool: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        self.record(tool)
+        result = self.caller.post_tool(tool, arguments, calls=1)
+        self.record(tool, result=result)
+        return result
+
+    def fetch_new_reports(self, stats_result: dict[str, Any]) -> None:
+        if not self.auto_fetch_reports:
+            return
+        for report in reports_from_value(stats_result):
+            report_id = str(report.get("report_id") or report.get("id") or "")
+            key = report_key(report)
+            if not report_id or not key or key in self.fetched_report_keys:
+                continue
+            result = self.paid_call("auditor_get_report", {"report_id": report_id})
+            if result.get("receipt", {}).get("ok"):
+                self.fetched_report_keys.add(key)
+
+    def run(self) -> None:
+        if self.duration_seconds <= 0:
+            self.record("disabled", error=RuntimeError("SAP_CALLER_RUN_DURATION_SECONDS must be set to auto-run."))
+            return
+
+        now = time.time()
+        with self.lock:
+            self.started_at = now
+            self.ends_at = now + self.duration_seconds
+
+        try:
+            self.paid_call("auditor_launch", self.launch_arguments)
+            next_stats_at = time.time() + max(1, self.stats_interval_seconds)
+            while not self.stop_event.is_set() and time.time() < (self.ends_at or 0):
+                now = time.time()
+                if now >= next_stats_at:
+                    stats_result = self.paid_call("auditor_stats", {})
+                    self.fetch_new_reports(stats_result)
+                    next_stats_at = now + max(1, self.stats_interval_seconds)
+                wait_seconds = min(max(0.0, next_stats_at - time.time()), max(0.0, (self.ends_at or 0) - time.time()), 1.0)
+                self.stop_event.wait(wait_seconds)
+        except Exception as error:
+            self.record(self.last_action or "auto_run", error=error)
+        finally:
+            try:
+                self.paid_call("auditor_stop", {})
+            except Exception as error:
+                self.record("auditor_stop", error=error)
+            with self.lock:
+                self.stopped_at = time.time()
 
 
 def http_request(
@@ -722,22 +910,10 @@ def read_request_json(handler: BaseHTTPRequestHandler) -> dict[str, Any]:
     return data
 
 
-def public_config(caller: CallerAgent) -> dict[str, Any]:
-    keypair_hint = Path(caller.keypair_path).name if caller.keypair_path else "missing keypair"
-    return {
-        "base_url": caller.base_url,
-        "registration": str(caller.registration_path),
-        "receipts": str(caller.receipts_path),
-        "agent_wallet": caller.agent_wallet,
-        "network": caller.network,
-        "price_per_call_lamports": caller.price_per_call,
-        "min_escrow_deposit_lamports": caller.min_escrow_deposit,
-        "session_calls": caller.session_calls,
-        "depositor_hint": keypair_hint,
-    }
-
-
 def serve_home(caller: CallerAgent, host: str, port: int) -> None:
+    auto_caller = AutoCaller(caller)
+    auto_caller.start()
+
     class CallerHandler(BaseHTTPRequestHandler):
         def log_message(self, format: str, *args: Any) -> None:
             print(f"{self.address_string()} - {format % args}")
@@ -748,8 +924,8 @@ def serve_home(caller: CallerAgent, host: str, port: int) -> None:
                 if parsed.path == "/":
                     html_response(self, HOME_HTML)
                     return
-                if parsed.path == "/api/config":
-                    json_response(self, 200, public_config(caller))
+                if parsed.path == "/api/automation":
+                    json_response(self, 200, auto_caller.snapshot())
                     return
                 if parsed.path == "/api/receipts":
                     json_response(self, 200, read_receipts(caller.receipts_path))
@@ -768,25 +944,21 @@ def serve_home(caller: CallerAgent, host: str, port: int) -> None:
             parsed = urlparse(self.path)
             try:
                 payload = read_request_json(self)
-                if parsed.path == "/api/launch":
-                    result = caller.post_tool("auditor_launch", {
-                        "page": int(payload.get("page") or 1),
-                        "page_size": int(payload.get("page_size") or 3),
-                        "max_files_per_task": int(payload.get("max_files_per_task") or 80),
-                        "audit_timeout_seconds": int(payload.get("audit_timeout_seconds") or 60),
-                        "program_timeout_seconds": int(payload.get("program_timeout_seconds") or 60),
-                    }, calls=1)
-                    json_response(self, 200, result)
-                    return
                 if parsed.path == "/api/stats":
-                    json_response(self, 200, caller.post_tool("auditor_stats", {}, calls=1))
+                    result = caller.post_tool("auditor_stats", {}, calls=1)
+                    auto_caller.fetch_new_reports(result)
+                    json_response(self, 200, result)
                     return
                 if parsed.path == "/api/report":
                     report_id = str(payload.get("report_id") or "")
                     if not report_id:
                         json_response(self, 422, {"error": "Missing report_id"})
                         return
-                    json_response(self, 200, caller.post_tool("auditor_get_report", {"report_id": report_id}, calls=1))
+                    report = local_report(read_receipts(caller.receipts_path), report_id)
+                    if not report:
+                        json_response(self, 404, {"error": "report_not_fetched_yet", "report_id": report_id})
+                        return
+                    json_response(self, 200, report)
                     return
                 if parsed.path == "/api/tool":
                     tool = str(payload.get("tool") or "")

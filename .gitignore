@@ -2,3 +2,4 @@ node_modules/
 dist/
 .sap-keypair*.json
 work/sap-registration.json
+work/report_access.json

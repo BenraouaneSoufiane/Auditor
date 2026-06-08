@@ -3,6 +3,7 @@ import "dotenv/config";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { randomInt } from "node:crypto";
 
 import { Connection, Keypair, PublicKey, SystemProgram, type TransactionInstruction } from "@solana/web3.js";
 
@@ -17,6 +18,8 @@ type PaymentRequest = {
   calls?: number;
   maxCalls?: number;
   forceCreate?: boolean;
+  freshEscrow?: boolean;
+  escrowNonce?: number;
 };
 
 const require = createRequire(import.meta.url);
@@ -90,6 +93,12 @@ function u64Le(value: number) {
   const buffer = Buffer.alloc(8);
   buffer.writeBigUInt64LE(BigInt(value));
   return buffer;
+}
+
+function freshNonce() {
+  const timeBits = Date.now() % 1_000_000_000;
+  const randomBits = randomInt(1_000_000);
+  return timeBits * 1_000_000 + randomBits;
 }
 
 function deriveEscrowV2(agentPda: PublicKey, depositor: PublicKey, escrowNonce: number, programId: PublicKey) {
@@ -172,7 +181,7 @@ async function main() {
   const requestedCost = pricePerCall.mul(new BN(calls));
   const deposit = BN.max(minDeposit, requestedCost);
 
-  const escrowNonce = 0;
+  const escrowNonce = Number(request.escrowNonce ?? (request.freshEscrow ? freshNonce() : 0));
   const [agentPda] = Pdas.getAgentPDA(agentWallet);
   const [agentStatsPda] = Pdas.getAgentStatsPDA(agentPda);
   const [agentStakePda] = Pdas.getAgentStakePDA(agentPda);
@@ -263,6 +272,7 @@ async function main() {
   console.log(JSON.stringify({
     action,
     txSignature,
+    escrowNonce,
     depositorWallet: signer.publicKey.toBase58(),
     headers,
     escrowPda: headers["X-Payment-Escrow"],
