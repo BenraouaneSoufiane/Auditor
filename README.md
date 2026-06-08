@@ -231,6 +231,37 @@ curl -X POST http://127.0.0.1:8000/launch \
 curl http://127.0.0.1:8000/stats | jq .
 ```
 
+### Paid Caller Agent
+
+This repo also includes a standalone Python caller app that pays with the existing Solana keypair, calls the SAP tools, and records local receipt outlines.
+
+Defaults are read from `.env`, `work/sap-registration.json`, and `.sap-keypair-mainnet.json` when present:
+
+```bash
+python3 caller_agent.py tools
+python3 caller_agent.py serve --host 127.0.0.1 --port 8088
+python3 caller_agent.py launch --page 1 --page-size 3
+python3 caller_agent.py stats
+python3 caller_agent.py report report_<id>
+python3 caller_agent.py receipts
+```
+
+The home page is available at `http://127.0.0.1:8088` and provides paid launch, stats, report retrieval, custom tool calls, and local receipt browsing.
+
+To point at a local agent instead of the registered public URL:
+
+```bash
+python3 caller_agent.py --base-url http://127.0.0.1:8000 serve
+```
+
+For arbitrary paid SAP tool calls:
+
+```bash
+python3 caller_agent.py call auditor_get_report --arg report_id=report_<id>
+```
+
+The caller creates or tops up the SAP x402 escrow before each paid call by delegating payment/header construction to `scripts/sap-caller-payment.ts`. Receipts are appended to `work/caller_receipts.jsonl` and include the call ID, tool, HTTP status, escrow PDA, depositor wallet, payment transaction signature when a create/top-up occurred, and returned report IDs when available.
+
 ## Architecture
 
 ### Core Components

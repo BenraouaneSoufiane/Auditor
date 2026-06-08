@@ -61,9 +61,82 @@ const connection = new Connection(rpc.url, {
   httpHeaders: rpc.apiKey ? { "x-api-key": rpc.apiKey } : undefined,
 });
 const client = new SapClient({ connection });
-const validator = new SapMerchantValidator(connection, (pda: PublicKey) =>
-  (client.escrow as any).fetchByPda(pda).catch(() => null),
+const legacyValidator = new SapMerchantValidator(connection, (pda: PublicKey) =>
+  (client.escrow as any).fetchByPda?.(pda).catch(() => null),
 );
+
+function asBigInt(value: unknown): bigint {
+  if (value && typeof value === "object" && "toString" in value) {
+    return BigInt(String((value as { toString(): string }).toString()));
+  }
+  return BigInt(String(value ?? 0));
+}
+
+function pubkeyString(value: unknown): string | null {
+  if (value instanceof PublicKey) return value.toBase58();
+  if (value && typeof value === "object" && "toBase58" in value) {
+    return String((value as { toBase58(): string }).toBase58());
+  }
+  return value == null ? null : String(value);
+}
+
+async function fetchEscrowByHeaderPda(escrowPda: PublicKey) {
+  const program = (client as any).program;
+  const v2 = await program.account.escrowAccountV2?.fetch(escrowPda).catch(() => null);
+  if (v2) return { version: 2, account: v2 };
+  const v1 = await program.account.escrowAccount?.fetch(escrowPda).catch(() => null);
+  if (v1) return { version: 1, account: v1 };
+  return null;
+}
+
+async function validateHeaderEscrow(headers: Record<string, string>, callsToSettle: number) {
+  const parsed = parseX402Headers(headers);
+  const fetched = await fetchEscrowByHeaderPda(parsed.escrowPda);
+  if (!fetched) {
+    return { valid: false, errors: [`Escrow not found at ${parsed.escrowPda.toBase58()}`], parsed };
+  }
+
+  const escrow = fetched.account;
+  const errors: string[] = [];
+  const escrowAgent = pubkeyString(escrow.agent);
+  const escrowDepositor = pubkeyString(escrow.depositor);
+  const escrowPrice = asBigInt(escrow.pricePerCall);
+  const escrowBalance = asBigInt(escrow.balance);
+  const escrowMaxCalls = asBigInt(escrow.maxCalls);
+  const escrowSettledCalls = asBigInt(escrow.totalCallsSettled);
+  const escrowExpiresAt = asBigInt(escrow.expiresAt);
+  const needed = asBigInt(parsed.pricePerCall) * BigInt(callsToSettle);
+
+  if (escrowAgent && escrowAgent !== parsed.agentPda.toBase58()) {
+    errors.push(`Escrow agent mismatch: ${escrowAgent} != ${parsed.agentPda.toBase58()}`);
+  }
+  if (escrowDepositor && escrowDepositor !== parsed.depositorWallet.toBase58()) {
+    errors.push(`Escrow depositor mismatch: ${escrowDepositor} != ${parsed.depositorWallet.toBase58()}`);
+  }
+  if (escrowPrice !== asBigInt(parsed.pricePerCall)) {
+    errors.push(`Escrow price mismatch: ${escrowPrice} != ${parsed.pricePerCall.toString()}`);
+  }
+  if (escrowBalance < needed) {
+    errors.push(`Insufficient balance: ${escrowBalance} < ${needed}`);
+  }
+  if (escrowMaxCalls > 0n && escrowMaxCalls - escrowSettledCalls < BigInt(callsToSettle)) {
+    errors.push(`Max calls exceeded: ${escrowMaxCalls - escrowSettledCalls} remaining but needs ${callsToSettle}`);
+  }
+  if (escrowExpiresAt > 0n && escrowExpiresAt < BigInt(Math.floor(Date.now() / 1000))) {
+    errors.push(`Escrow expired at ${escrowExpiresAt}`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    parsed,
+    escrowValidation: {
+      escrowPda: parsed.escrowPda,
+      escrow,
+      version: fetched.version,
+    },
+  };
+}
 
 const server = BunLikeServer();
 
@@ -105,10 +178,14 @@ function BunLikeServer() {
             throw new Error(`Unexpected X-Payment-PricePerCall ${parsed.pricePerCall.toString()}`);
           }
 
-          const result = await validator.validateRequest(headers, {
-            callsToSettle: Number(body.calls_to_settle ?? body.callsToSettle ?? 1),
-            throwOnMissingAta: false,
-          });
+          const callsToSettle = Number(body.calls_to_settle ?? body.callsToSettle ?? 1);
+          let result = await validateHeaderEscrow(headers, callsToSettle);
+          if (!result.valid && (client.escrow as any).fetchByPda) {
+            result = await legacyValidator.validateRequest(headers, {
+              callsToSettle,
+              throwOnMissingAta: false,
+            }) as typeof result;
+          }
 
           if (!result.valid) {
             res.writeHead(402, { "content-type": "application/json" });
@@ -119,7 +196,7 @@ function BunLikeServer() {
           res.writeHead(200, { "content-type": "application/json" });
           res.end(JSON.stringify({
             ok: true,
-            escrowPda: result.escrowValidation.escrowPda.toBase58(),
+            escrowPda: parsed.escrowPda.toBase58(),
             depositorWallet: parsed.depositorWallet.toBase58(),
             maxCalls: parsed.maxCalls.toString(),
             pricePerCall: parsed.pricePerCall.toString(),
