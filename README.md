@@ -91,7 +91,7 @@ AGENT_BASE_URL=http://127.0.0.1:8000
 # SAP (Synapse Agent Protocol) payment settings
 SAP_REQUIRE_PAYMENT=false
 SAP_PAYMENT_VERIFY_URL=http://127.0.0.1:8787/verify
-SAP_PRICE_PER_CALL_LAMPORTS=1000
+SAP_PRICE_PER_CALL_LAMPORTS=50000000
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS=10000
 EOF
 ```
@@ -145,7 +145,7 @@ CCR_CMD="claude -p --setting-sources project,local" \
 AGENT_BASE_URL="https://audits.click" \
 SAP_REQUIRE_PAYMENT=true \
 SAP_PAYMENT_VERIFY_URL="http://127.0.0.1:8787/verify" \
-SAP_PRICE_PER_CALL_LAMPORTS=1000 \
+SAP_PRICE_PER_CALL_LAMPORTS=50000000 \
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS=10000 \
 pm2 start .venv/bin/uvicorn --name auditor-agent -- agent:app --host 127.0.0.1 --port 8000
 ```
@@ -382,7 +382,7 @@ Reports are saved to:
 | `SAP_REQUIRE_PAYMENT` | `true` | Require x402 payment for SAP tools |
 | `SAP_PAYMENT_VERIFY_URL` | Empty | URL to verify x402 payment receipts |
 | `SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS` | `false` | Allow unverified payment receipts |
-| `SAP_PRICE_PER_CALL_LAMPORTS` | `1000` | Price per SAP tool call (Lamports) |
+| `SAP_PRICE_PER_CALL_LAMPORTS` | `50000000` | Price per SAP tool call (Lamports; 0.05 SOL) |
 | `SAP_MIN_ESCROW_DEPOSIT_LAMPORTS` | `10000` | Minimum escrow deposit (Lamports) |
 
 ## Payment (x402 Protocol)
@@ -392,7 +392,7 @@ The agent supports **Solana-based payment** via the **x402 protocol** for decent
 - **Settlement**: Escrow-based
 - **Network**: Solana Mainnet Beta
 - **Currency**: SOL (Lamports)
-- **Price Per Call**: Configurable (default: 1000 Lamports)
+- **Price Per Call**: Configurable (default: 50000000 Lamports / 0.05 SOL)
 - **Min Escrow**: Configurable (default: 10000 Lamports)
 
 To disable payment requirements, set:
@@ -413,7 +413,7 @@ cd /root/auditor
 SAP_RPC_URL="https://api.mainnet-beta.solana.com" \
 SAP_AGENT_PDA="5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7" \
 SAP_AGENT_KEYPAIR_PATH="/root/auditor/.sap-agent-keypair-mainnet.json" \
-SAP_PRICE_PER_CALL_LAMPORTS=1000 \
+SAP_PRICE_PER_CALL_LAMPORTS=50000000 \
 SAP_PAYMENT_VERIFIER_PORT=8787 \
 pm2 start npm --name sap-payment-verifier -- run sap:verify-payment
 ```
@@ -445,7 +445,7 @@ X-Payment-Agent: 5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7
 X-Payment-Depositor: <caller_wallet>
 X-Payment-Escrow-Nonce: <escrow_nonce>
 X-Payment-MaxCalls: <funded_call_allowance>
-X-Payment-PricePerCall: 1000
+X-Payment-PricePerCall: 50000000
 X-Payment-Program: SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ
 X-Payment-Network: solana:mainnet-beta
 ```
@@ -477,7 +477,7 @@ curl -X POST https://audits.click/sap/tools/auditor_get_report \
   -H "X-Payment-Agent: 5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7" \
   -H "X-Payment-Depositor: <caller_wallet>" \
   -H "X-Payment-MaxCalls: <funded_call_allowance>" \
-  -H "X-Payment-PricePerCall: 1000" \
+  -H "X-Payment-PricePerCall: 50000000" \
   -H "X-Payment-Program: SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ" \
   -H "X-Payment-Network: solana:mainnet-beta" \
   -d '{"arguments":{"report_id":"report_..."}}'
@@ -522,6 +522,12 @@ The registration script writes a summary to:
 
 ```bash
 work/sap-registration.json
+```
+
+To update pricing for an already-registered agent, opt in to the update transaction:
+
+```bash
+SAP_UPDATE_AGENT=true npm run sap:register
 ```
 
 Current mainnet addresses from the completed registration:

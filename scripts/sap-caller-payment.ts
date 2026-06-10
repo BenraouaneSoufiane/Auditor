@@ -64,14 +64,15 @@ function escrowSummary(escrow: any, pricePerCall: any) {
   const totalCallsSettled = Number(escrow.totalCallsSettled?.toString?.() ?? "0");
   const unitPrice = BigInt(pricePerCall?.toString?.() ?? escrow.pricePerCall?.toString?.() ?? "0");
   const affordableCalls = unitPrice > 0n ? Number(balance / unitPrice) : Number.POSITIVE_INFINITY;
-  const callsRemaining = maxCalls > 0 ? Math.max(0, maxCalls - totalCallsSettled) : Number.POSITIVE_INFINITY;
+  const maxCallsRemaining = maxCalls > 0 ? Math.max(0, maxCalls - totalCallsSettled) : Number.POSITIVE_INFINITY;
   const expiresAt = Number(escrow.expiresAt?.toString?.() ?? "0");
   return {
     balance: bnString(escrow.balance),
     totalDeposited: bnString(escrow.totalDeposited),
     totalSettled: bnString(escrow.totalSettled),
     totalCallsSettled: bnString(escrow.totalCallsSettled),
-    callsRemaining: String(Math.min(callsRemaining, affordableCalls)),
+    callsRemaining: String(Math.min(maxCallsRemaining, affordableCalls)),
+    maxCallsRemaining: String(maxCallsRemaining),
     affordableCalls: String(affordableCalls),
     isExpired: expiresAt > 0 && Math.floor(Date.now() / 1000) >= expiresAt,
   };
@@ -256,6 +257,23 @@ async function sendInstructions(client: any, signer: Keypair, instructions: any[
     limit: Number(process.env.SAP_COMPUTE_UNIT_LIMIT ?? 0) || undefined,
   });
   tx.sign([signer]);
+  const simulation = await client.connection.simulateTransaction(tx, {
+    commitment: "confirmed",
+    sigVerify: false,
+  });
+  if (simulation.value.err) {
+    throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.err)}\n${(simulation.value.logs ?? []).join("\n")}`);
+  }
+  if (new Set(["1", "true", "yes", "on"]).has((process.env.SAP_DRY_RUN ?? "").toLowerCase())) {
+    return {
+      signature: null,
+      dryRun: true,
+      simulation: {
+        unitsConsumed: simulation.value.unitsConsumed,
+        logs: simulation.value.logs ?? [],
+      },
+    };
+  }
   const signature = await client.connection.sendRawTransaction(tx.serialize(), {
     preflightCommitment: "confirmed",
     maxRetries: 3,
@@ -264,7 +282,14 @@ async function sendInstructions(client: any, signer: Keypair, instructions: any[
   if (confirmation.value.err) {
     throw new Error(`Transaction ${signature} failed confirmation: ${JSON.stringify(confirmation.value.err)}`);
   }
-  return signature;
+  return {
+    signature,
+    dryRun: false,
+    simulation: {
+      unitsConsumed: simulation.value.unitsConsumed,
+      logs: simulation.value.logs ?? [],
+    },
+  };
 }
 
 function reorderCreateEscrowV2ForDeployedProgram(
@@ -333,7 +358,7 @@ async function main() {
   const escrowPda = useLegacyEscrow ? legacyEscrowPda : escrowV2Pda;
   const [pricingMenuPda] = derivePricingMenu(agentPda, client.programId);
   let action = "reuse";
-  let txSignature: string | null = null;
+  let txResult: Awaited<ReturnType<typeof sendInstructions>> | null = null;
   let escrowBefore = useLegacyEscrow
     ? await fetchEscrow(client, escrowPda)
     : await fetchEscrowV2(client, escrowPda);
@@ -352,7 +377,7 @@ async function main() {
           initialDeposit: deposit,
           programId: client.programId,
         });
-      txSignature = await sendInstructions(client, signer, [instruction]);
+      txResult = await sendInstructions(client, signer, [instruction]);
     } else {
       const instruction = await client.program.methods
         .createEscrowV2(
@@ -379,7 +404,7 @@ async function main() {
           systemProgram: SystemProgram.programId,
         })
         .instruction();
-      txSignature = await sendInstructions(client, signer, [
+      txResult = await sendInstructions(client, signer, [
         reorderCreateEscrowV2ForDeployedProgram(instruction, {
           depositor: signer.publicKey,
           agent: agentPda,
@@ -392,12 +417,20 @@ async function main() {
       ]);
     }
   } else {
+    if (useLegacyEscrow) {
+      const escrowPrice = escrowBefore.pricePerCall?.toString?.() ?? "";
+      if (escrowPrice !== pricePerCall.toString()) {
+        throw new Error(
+          `Existing legacy escrow ${escrowPda.toBase58()} has pricePerCall=${escrowPrice}, but the caller is configured for ${pricePerCall.toString()}. Legacy escrow PDAs are fixed per depositor/agent, so use a different caller keypair or close/replace the existing escrow before creating one at the new price.`,
+        );
+      }
+    }
     const before = escrowSummary(escrowBefore, pricePerCall);
     const affordableCalls = Number(before?.affordableCalls ?? 0);
-    const callsRemaining = Number(before?.callsRemaining ?? 0);
-    if (callsRemaining < calls) {
+    const maxCallsRemaining = Number(before?.maxCallsRemaining ?? 0);
+    if (maxCallsRemaining < calls) {
       throw new Error(
-        `Existing escrow has only ${callsRemaining} calls remaining. Use a different depositor keypair or close/recreate the escrow with a larger maxCalls.`,
+        `Existing escrow has only ${maxCallsRemaining} max calls remaining. Use a different depositor keypair or close/recreate the escrow with a larger maxCalls.`,
       );
     }
     if (affordableCalls < calls) {
@@ -419,7 +452,7 @@ async function main() {
             systemProgram: SystemProgram.programId,
           })
           .instruction();
-      txSignature = await sendInstructions(client, signer, [instruction]);
+      txResult = await sendInstructions(client, signer, [instruction]);
     }
   }
 
@@ -443,7 +476,9 @@ async function main() {
 
   console.log(JSON.stringify({
     action,
-    txSignature,
+    txSignature: txResult?.signature ?? null,
+    dryRun: txResult?.dryRun ?? false,
+    simulation: txResult?.simulation ?? null,
     escrowNonce: useLegacyEscrow ? 0 : escrowNonce,
     escrowVersion: useLegacyEscrow ? 1 : 2,
     depositorWallet: signer.publicKey.toBase58(),

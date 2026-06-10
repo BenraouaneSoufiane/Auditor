@@ -7,7 +7,7 @@
     "pricing": [
       {
         "tierId": "x402-escrow-standard",
-        "pricePerCall": "1000",
+        "pricePerCall": "50000000",
         "rateLimit": 6,
         "maxCallsPerSession": 20,
         "burstLimit": 3,

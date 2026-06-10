@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { Connection, Keypair, PublicKey, type TransactionInstruction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import type { SapClient as SapClientType } from "@oobe-protocol-labs/synapse-sap-sdk";
 import type BNType from "bn.js";
 
@@ -46,6 +46,7 @@ const BUILD_ONLY = (process.env.SAP_BUILD_ONLY ?? "false").toLowerCase() === "tr
 const INSCRIBE_SCHEMAS = (process.env.SAP_INSCRIBE_SCHEMAS ?? "false").toLowerCase() === "true";
 const SKIP_ACCOUNT_CHECKS = (process.env.SAP_SKIP_ACCOUNT_CHECKS ?? "false").toLowerCase() === "true";
 const ASSUME_AGENT_REGISTERED = (process.env.SAP_ASSUME_AGENT_REGISTERED ?? "false").toLowerCase() === "true";
+const UPDATE_AGENT = (process.env.SAP_UPDATE_AGENT ?? "false").toLowerCase() === "true";
 const CONFIRM_TRANSACTIONS = (process.env.SAP_CONFIRM_TRANSACTIONS ?? "true").toLowerCase() !== "false";
 const SKIP_TOOLS = new Set(
   (process.env.SAP_SKIP_TOOLS ?? "")
@@ -102,6 +103,19 @@ function deriveToolPda(agentPda: PublicKey, toolName: string, programId: PublicK
     [Buffer.from("sap_tool"), agentPda.toBuffer(), Buffer.from(hashBytes(toolName))],
     programId,
   );
+}
+
+function derivePricingMenu(agentPda: PublicKey, programId: PublicKey) {
+  return PublicKey.findProgramAddressSync([Buffer.from("sap_pricing"), agentPda.toBuffer()], programId);
+}
+
+function deployedUpdateAgentIx(ix: TransactionInstruction) {
+  if (ix.keys.length !== 4) return ix;
+  return new TransactionInstruction({
+    programId: ix.programId,
+    data: ix.data,
+    keys: [ix.keys[0], ix.keys[1], ix.keys[3], ix.keys[2]],
+  });
 }
 
 function schemaString(value: unknown): string {
@@ -308,6 +322,7 @@ async function main() {
   const [agentPda] = Pdas.getAgentPDA(signer.publicKey);
   const [agentStatsPda] = Pdas.getAgentStatsPDA(agentPda);
   const [globalPda] = Pdas.getGlobalPDA();
+  const [pricingMenuPda] = derivePricingMenu(agentPda, client.programId);
 
   const capabilities = manifest.agent.capabilities.map((capability) => ({
     id: capability.id,
@@ -324,6 +339,7 @@ async function main() {
     agentPda: agentPda.toBase58(),
     agentStatsPda: agentStatsPda.toBase58(),
     globalPda: globalPda.toBase58(),
+    pricingMenuPda: pricingMenuPda.toBase58(),
     agentBaseUrl: AGENT_BASE_URL,
     agentUri: `${AGENT_BASE_URL}/sap/agent`,
     x402Endpoint: `${AGENT_BASE_URL}/sap/tools`,
@@ -354,6 +370,24 @@ async function main() {
   if (existingAgent) {
     result.agentSkipped = true;
     if (ASSUME_AGENT_REGISTERED) result.agentSkipReason = "SAP_ASSUME_AGENT_REGISTERED";
+    if (UPDATE_AGENT) {
+      const updateIx = await client.agent.updateAgent({
+        signer,
+        wallet: signer.publicKey,
+        agent: agentPda,
+        pricingMenu: pricingMenuPda,
+        name: null,
+        description: null,
+        capabilities: null,
+        pricing: manifest.agent.pricing.map(pricingTierFromConfig) as never,
+        protocols: null,
+        agentId: null,
+        agentUri: null,
+        x402Endpoint: null,
+      });
+      result.agentUpdateMode = "pricing_only";
+      result.agentUpdateTx = await sendOne(client, signer, deployedUpdateAgentIx(updateIx));
+    }
   } else {
     const registerIx = await client.agent.registerAgent({
       signer,

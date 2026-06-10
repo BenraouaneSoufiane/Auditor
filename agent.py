@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("auditor-agent")
@@ -30,7 +30,7 @@ SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS = (
     os.getenv("SAP_PAYMENT_ALLOW_UNVERIFIED_RECEIPTS", "false").lower() in {"1", "true", "yes", "on"}
 )
 SAP_PAYMENT_SETTLE_URL = os.getenv("SAP_PAYMENT_SETTLE_URL", "").strip()
-SAP_PRICE_PER_CALL_LAMPORTS = int(os.getenv("SAP_PRICE_PER_CALL_LAMPORTS", "1000"))
+SAP_PRICE_PER_CALL_LAMPORTS = int(os.getenv("SAP_PRICE_PER_CALL_LAMPORTS", "50000000"))
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS = int(os.getenv("SAP_MIN_ESCROW_DEPOSIT_LAMPORTS", "10000"))
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY", "")

@@ -18,9 +18,9 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 try:
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv as dotenv_load
 except ModuleNotFoundError:
-    def load_dotenv(path: Path) -> None:
+    def load_dotenv(path: Path, override: bool = False) -> None:
         if not path.exists():
             return
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -28,11 +28,16 @@ except ModuleNotFoundError:
             if not stripped or stripped.startswith("#") or "=" not in stripped:
                 continue
             key, value = stripped.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+            key = key.strip()
+            if override or key not in os.environ:
+                os.environ[key] = value.strip().strip('"').strip("'")
+else:
+    def load_dotenv(path: Path, override: bool = False) -> None:
+        dotenv_load(path, override=override)
 
 
 ROOT = Path(__file__).resolve().parent
-load_dotenv(ROOT / ".env")
+load_dotenv(ROOT / ".env", override=True)
 WORKDIR = Path(os.getenv("WORKDIR", ROOT / "work")).resolve()
 DEFAULT_REGISTRATION = WORKDIR / "sap-registration.json"
 DEFAULT_RECEIPTS = WORKDIR / "caller_receipts.jsonl"
@@ -585,7 +590,7 @@ def launch_args_from_env() -> dict[str, int]:
 
 class CallerAgent:
     def __init__(self, args: argparse.Namespace) -> None:
-        load_dotenv(ROOT / ".env")
+        load_dotenv(ROOT / ".env", override=True)
         self.registration_path = Path(args.registration).resolve()
         self.registration = load_json_file(self.registration_path, {})
         self.receipts_path = Path(args.receipts).resolve()
@@ -595,7 +600,7 @@ class CallerAgent:
         self.rpc_api_key = args.rpc_api_key or os.getenv("SAP_RPC_API_KEY") or os.getenv("SYNAPSE_API_KEY")
         self.keypair_path = args.keypair or os.getenv("SAP_KEYPAIR_PATH") or os.getenv("ANCHOR_WALLET")
         self.network = args.network or os.getenv("SAP_PAYMENT_NETWORK") or "solana:mainnet-beta"
-        self.price_per_call = str(args.price_per_call or os.getenv("SAP_PRICE_PER_CALL_LAMPORTS") or "1000")
+        self.price_per_call = str(args.price_per_call or os.getenv("SAP_PRICE_PER_CALL_LAMPORTS") or "50000000")
         self.min_escrow_deposit = str(args.min_escrow_deposit or os.getenv("SAP_MIN_ESCROW_DEPOSIT_LAMPORTS") or "10000")
         self.session_calls = int(args.session_calls or os.getenv("SAP_CALLER_MAX_CALLS") or self.manifest_session_calls() or 20)
         self.timeout = args.timeout
@@ -648,6 +653,7 @@ class CallerAgent:
             "freshEscrow": self.fresh_escrow_per_call or force_create,
         }
         env = os.environ.copy()
+        env["SAP_LEGACY_SETTLE_CALLS"] = os.getenv("SAP_LEGACY_SETTLE_CALLS", "true")
         env["SAP_CALLER_PAYMENT_REQUEST"] = json.dumps(request)
         command = ["npx", "tsx", str(PAYMENT_SCRIPT)]
         completed = subprocess.run(
@@ -956,7 +962,14 @@ def serve_home(caller: CallerAgent, host: str, port: int) -> None:
                         return
                     report = local_report(read_receipts(caller.receipts_path), report_id)
                     if not report:
-                        json_response(self, 404, {"error": "report_not_fetched_yet", "report_id": report_id})
+                        result = caller.post_tool("auditor_get_report", {"report_id": report_id}, calls=1)
+                        if result.get("receipt", {}).get("ok"):
+                            json_response(self, 200, {
+                                "receipt": result["receipt"],
+                                "body": result.get("body"),
+                            })
+                            return
+                        json_response(self, int(result.get("receipt", {}).get("status_code") or 502), result)
                         return
                     json_response(self, 200, report)
                     return

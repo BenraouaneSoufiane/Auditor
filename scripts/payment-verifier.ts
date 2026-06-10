@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config as loadDotenv } from "dotenv";
 
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -7,6 +7,7 @@ import { resolve } from "node:path";
 import { Connection, Keypair, PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 
 const require = createRequire(import.meta.url);
+loadDotenv({ override: true });
 const { Wallet, BN } = require("@coral-xyz/anchor") as typeof import("@coral-xyz/anchor");
 const { SapClient, Pdas } = require("@oobe-protocol-labs/synapse-sap-sdk") as typeof import("@oobe-protocol-labs/synapse-sap-sdk");
 const { SapMerchantValidator, parseX402Headers } = require(
@@ -21,7 +22,7 @@ const rawApiKey = process.env.SAP_RPC_API_KEY ?? process.env.SYNAPSE_API_KEY;
 const port = Number(process.env.SAP_PAYMENT_VERIFIER_PORT ?? "8787");
 const expectedAgentPda = process.env.SAP_AGENT_PDA ?? "5qPThoENH14iJD3MpJfU4w8pAeHJ5wAzWcdWXm6SY5Y7";
 const expectedProgramId = process.env.SAP_PROGRAM_ID ?? "SAPpUhsWLJG1FfkGRcXagEDMrMsWGjbky7AyhGpFETZ";
-const expectedPricePerCall = process.env.SAP_PRICE_PER_CALL_LAMPORTS ?? "1000";
+const expectedPricePerCall = process.env.SAP_PRICE_PER_CALL_LAMPORTS ?? "50000000";
 const allowNetwork = process.env.SAP_PAYMENT_NETWORK ?? "solana:mainnet-beta";
 const settlementRequired = !new Set(["0", "false", "no", "off"]).has(
   (process.env.SAP_SETTLEMENT_REQUIRED ?? "true").toLowerCase(),
@@ -379,13 +380,12 @@ async function settleHeaderEscrow(body: Record<string, unknown>, headers: Record
   }
 
   if (useLegacySettleCalls) {
-    const treasury = treasuryAccount ?? settlementSigner.publicKey;
     const instruction = legacySettleCallsInstruction({
       wallet: settlementSigner.publicKey,
       agent: parsed.agentPda,
       agentStats: agentStatsPda,
       escrow: parsed.escrowPda,
-      treasury,
+      treasury: parsed.depositorWallet,
     }, callsToSettle, hash);
     const signature = await sendInstructions([instruction]);
     return {
