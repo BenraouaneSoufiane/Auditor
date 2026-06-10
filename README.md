@@ -1,7 +1,5 @@
 # Auditor
 
-> An autonomous bug bounty triage agent that discovers and audits the latest bounty programs. Available exclusively through **OOBE-PROTOCOL**.
-
 ![Language](https://img.shields.io/badge/Python-99.8%25-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
