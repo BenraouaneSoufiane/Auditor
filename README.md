@@ -145,8 +145,10 @@ SAP_REQUIRE_PAYMENT=true \
 SAP_PAYMENT_VERIFY_URL="http://127.0.0.1:8787/verify" \
 SAP_PRICE_PER_CALL_LAMPORTS=50000000 \
 SAP_MIN_ESCROW_DEPOSIT_LAMPORTS=10000 \
-pm2 start .venv/bin/uvicorn --name auditor-agent -- agent:app --host 127.0.0.1 --port 8000
+pm2 start .venv/bin/uvicorn --name auditor-agent --interpreter none -- agent:app --host 127.0.0.1 --port 8000
 ```
+
+`--interpreter none` is required so PM2 executes the Uvicorn binary directly instead of trying to run it with Node.js.
 
 If your public domain terminates TLS through nginx/Caddy, proxy `https://audits.click` to `127.0.0.1:8000`.
 

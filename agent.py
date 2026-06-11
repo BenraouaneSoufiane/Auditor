@@ -52,335 +52,89 @@ HOME_HTML = """
     :root {
       color-scheme: dark;
       --bg: #080b10;
-      --panel: #121821;
-      --panel-soft: #17202c;
       --text: #eef4ff;
       --muted: #95a3b7;
       --line: #243244;
       --accent: #45d19f;
-      --accent-strong: #24b880;
-      --danger: #ff6b6b;
+      --panel: #111821;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(69, 209, 159, 0.15), transparent 28rem),
-        linear-gradient(135deg, #080b10 0%, #101723 52%, #0b1017 100%);
+      background: var(--bg);
       color: var(--text);
     }
     main {
-      width: min(1080px, calc(100% - 32px));
+      width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 48px 0;
-    }
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
-      gap: 24px;
-      align-items: stretch;
-    }
-    .intro, .panel {
-      border: 1px solid var(--line);
-      background: rgba(18, 24, 33, 0.88);
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
-    }
-    .intro {
-      min-height: 420px;
-      padding: clamp(28px, 6vw, 64px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .eyebrow {
-      margin: 0 0 18px;
-      color: var(--accent);
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      padding: 40px 0;
     }
     h1 {
-      margin: 0;
-      max-width: 720px;
-      font-size: clamp(2.5rem, 6vw, 5.6rem);
-      line-height: 0.95;
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 7vw, 5rem);
+      line-height: 1;
       letter-spacing: 0;
     }
-    .description {
-      margin: 22px 0 0;
-      max-width: 680px;
+    p {
+      margin: 0 0 28px;
+      max-width: 760px;
       color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.22rem);
-      line-height: 1.65;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.55;
     }
-    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 4px; }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 32px;
-    }
-    button, .link-button {
-      min-height: 44px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      padding: 0 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      color: #06110d;
-      background: var(--accent);
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    button:hover, .link-button:hover { background: var(--accent-strong); }
-    button.secondary {
-      color: var(--text);
-      background: transparent;
-      border-color: var(--line);
-    }
-    button.secondary:hover { background: var(--panel-soft); }
-    button.danger {
-      color: #210606;
-      background: var(--danger);
-    }
-    button:disabled {
-      cursor: wait;
-      opacity: 0.68;
-    }
-    .panel {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .panel h2 {
-      margin: 0;
-      font-size: 1rem;
-      letter-spacing: 0;
-    }
-    .status {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel-soft);
-    }
-    .status strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 1.4rem;
-    }
-    .status span {
-      color: var(--muted);
-      line-height: 1.4;
-      overflow-wrap: anywhere;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .metric {
-      min-height: 82px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(8, 11, 16, 0.42);
-    }
-    .metric b {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 1.45rem;
-    }
-    .metric small {
-      color: var(--muted);
-      font-size: 0.78rem;
-    }
-    form {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    label {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-    input {
+    .video {
+      position: relative;
       width: 100%;
-      min-height: 40px;
-      border: 1px solid var(--line);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
       border-radius: 8px;
-      padding: 8px 10px;
-      background: #0c1119;
-      color: var(--text);
-      font: inherit;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
     }
-    .form-actions {
-      grid-column: 1 / -1;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    nav {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
-      margin-top: 4px;
+      gap: 18px;
+      margin-top: 24px;
     }
-    .log {
-      max-height: 220px;
-      overflow: auto;
-      margin: 0;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #070a0f;
-      color: #bfcbda;
-      font: 0.82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      white-space: pre-wrap;
+    a {
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
     }
-    @media (max-width: 860px) {
+    @media (max-width: 640px) {
       main { padding: 24px 0; }
-      .hero { grid-template-columns: 1fr; }
-      .intro { min-height: 340px; }
-    }
-    @media (max-width: 520px) {
-      .grid, form { grid-template-columns: 1fr; }
-      .actions, .form-actions { flex-direction: column; }
-      button, .link-button { width: 100%; }
+      nav { display: grid; gap: 12px; }
     }
   </style>
 </head>
 <body>
   <main>
-    <section class="hero" aria-label="Auditor home">
-      <div class="intro">
-        <p class="eyebrow">OOBE-PROTOCOL exclusive</p>
-        <h1>Auditor</h1>
-        <p class="description">
-          Really simple audit agent that checks latest bounty programs &amp; audit them.
-          Available exclusively through
-          <a href="https://explorer.oobeprotocol.ai/" target="_blank" rel="noreferrer">OOBE-PROTOCOL</a>.
-        </p>
-        <div class="actions">
-          <a class="link-button" href="https://github.com/BenraouaneSoufiane/Auditor" target="_blank" rel="noreferrer">View Repo</a>
-          <a class="link-button" href="/stats">Raw Stats</a>
-        </div>
-      </div>
-
-      <aside class="panel" aria-label="Agent controls">
-        <h2>Agent Control</h2>
-        <div class="status" aria-live="polite">
-          <strong id="state-label">Loading</strong>
-          <span id="current-label">Checking agent status...</span>
-        </div>
-
-        <div class="grid" aria-label="Run metrics">
-          <div class="metric"><b id="reports-count">0</b><small>Reports</small></div>
-          <div class="metric"><b id="errors-count">0</b><small>Errors</small></div>
-          <div class="metric"><b id="skipped-count">0</b><small>Skipped</small></div>
-        </div>
-
-        <form id="launch-form">
-          <label>Page
-            <input name="page" type="number" min="1" value="1">
-          </label>
-          <label>Page size
-            <input name="page_size" type="number" min="1" value="3">
-          </label>
-          <label>Max files
-            <input name="max_files_per_task" type="number" min="1" value="80">
-          </label>
-          <label>Audit timeout
-            <input name="audit_timeout_seconds" type="number" min="1" value="60">
-          </label>
-          <label>Program timeout
-            <input name="program_timeout_seconds" type="number" min="1" value="60">
-          </label>
-          <div class="form-actions">
-            <button id="launch-button" type="submit">Launch</button>
-            <button class="danger" id="stop-button" type="button">Stop</button>
-          </div>
-        </form>
-
-        <pre class="log" id="activity-log">Waiting for activity...</pre>
-      </aside>
-    </section>
+    <h1>Auditor</h1>
+    <p>A simple audit agent demo for OOBE Protocol.</p>
+    <div class="video">
+      <iframe
+        src="https://www.youtube.com/embed/Hi9v6NANG10"
+        title="Auditor demo"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <nav aria-label="Auditor links">
+      <a href="https://github.com/BenraouaneSoufiane/Auditor" target="_blank" rel="noreferrer">GitHub repo</a>
+      <a href="https://x.com/benra1sofian" target="_blank" rel="noreferrer">Benra1sofian on X</a>
+      <a href="https://x.com/OOBEonSol" target="_blank" rel="noreferrer">OOBE Protocol on X</a>
+    </nav>
   </main>
-
-  <script>
-    const stateLabel = document.querySelector("#state-label");
-    const currentLabel = document.querySelector("#current-label");
-    const reportsCount = document.querySelector("#reports-count");
-    const errorsCount = document.querySelector("#errors-count");
-    const skippedCount = document.querySelector("#skipped-count");
-    const activityLog = document.querySelector("#activity-log");
-    const launchButton = document.querySelector("#launch-button");
-    const stopButton = document.querySelector("#stop-button");
-    const form = document.querySelector("#launch-form");
-
-    function rows(title, items, formatter) {
-      if (!items || !items.length) return [`${title}: none`];
-      return [`${title}:`, ...items.slice(-5).map(formatter)];
-    }
-
-    async function refreshStats() {
-      try {
-        const response = await fetch("/stats");
-        const data = await response.json();
-        const running = Boolean(data.running);
-        stateLabel.textContent = running ? "Running" : "Idle";
-        currentLabel.textContent = data.current || (running ? "Starting..." : "Ready to launch");
-        reportsCount.textContent = (data.reports || []).length;
-        errorsCount.textContent = (data.errors || []).length;
-        skippedCount.textContent = (data.skipped || []).length;
-        launchButton.disabled = running;
-        stopButton.disabled = !running;
-
-        const lines = [
-          ...rows("Recent reports", data.reports, item => `- ${item.program || "Program"} / ${item.target || "Target"}`),
-          "",
-          ...rows("Recent errors", data.errors, item => `- ${item.program || "Program"}: ${item.error || "Unknown error"}`),
-          "",
-          ...rows("Recent skipped", data.skipped, item => `- ${item.program || "Program"} / ${item.target || "Target"}: ${item.reason || "Skipped"}`),
-        ];
-        activityLog.textContent = lines.join("\\n");
-      } catch (error) {
-        stateLabel.textContent = "Unavailable";
-        currentLabel.textContent = "Could not load /stats";
-        activityLog.textContent = String(error);
-      }
-    }
-
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      launchButton.disabled = true;
-      const payload = Object.fromEntries(new FormData(form).entries());
-      for (const key of Object.keys(payload)) payload[key] = Number(payload[key]);
-
-      const response = await fetch("/launch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (data.error) activityLog.textContent = data.error;
-      await refreshStats();
-    });
-
-    stopButton.addEventListener("click", async () => {
-      stopButton.disabled = true;
-      await fetch("/stop", { method: "POST" });
-      await refreshStats();
-    });
-
-    refreshStats();
-    setInterval(refreshStats, 2500);
-  </script>
 </body>
 </html>
 """
