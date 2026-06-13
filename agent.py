@@ -111,16 +111,65 @@ HOME_HTML = """
       text-decoration-thickness: 1px;
       text-underline-offset: 5px;
     }
+    .setup {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+    .setup h2 {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+      letter-spacing: 0;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .steps li {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .step-title {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+    code {
+      display: block;
+      overflow-x: auto;
+      margin: 0 0 10px;
+      color: #d7fbe9;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      white-space: nowrap;
+    }
+    .env-note {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
     @media (max-width: 640px) {
       main { padding: 24px 0; }
       nav { display: grid; gap: 12px; }
+      .steps { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <main>
     <h1>Auditor</h1>
-    <p>A simple audit agent demo for OOBE Protocol.</p>
+    <p>Simple autonomous audit agent through OOBE Protocol.</p>
     <div class="video">
       <iframe
         src="https://www.youtube.com/embed/Hi9v6NANG10"
@@ -129,6 +178,26 @@ HOME_HTML = """
         allowfullscreen>
       </iframe>
     </div>
+    <section class="setup" aria-labelledby="setup-title">
+      <h2 id="setup-title">Run it locally</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-title">1. Execution agent</span>
+          <code>uvicorn agent:app --host 127.0.0.1 --port 8000</code>
+          <span class="env-note">Uses <strong>BBRADAR_TOKEN</strong>, <strong>CCR_CMD</strong>, <strong>AGENT_BASE_URL</strong>, and SAP payment env vars from <strong>.env</strong>.</span>
+        </li>
+        <li>
+          <span class="step-title">2. Payment verifier</span>
+          <code>npm run sap:verify-payment</code>
+          <span class="env-note">Set <strong>SAP_RPC_URL</strong>, <strong>SAP_AGENT_PDA</strong>, <strong>SAP_AGENT_KEYPAIR_PATH</strong>, and <strong>SAP_PAYMENT_VERIFIER_PORT</strong>; the agent calls <strong>SAP_PAYMENT_VERIFY_URL</strong>.</span>
+        </li>
+        <li>
+          <span class="step-title">3. Caller agent</span>
+          <code>python3 caller_agent.py serve --host 127.0.0.1 --port 8088</code>
+          <span class="env-note">Uses <strong>SAP_KEYPAIR_PATH</strong>, <strong>SAP_CALLER_BASE_URL</strong>, and optional <strong>SAP_CALLER_*</strong> automation settings.</span>
+        </li>
+      </ol>
+    </section>
     <nav aria-label="Auditor links">
       <a href="https://github.com/BenraouaneSoufiane/Auditor" target="_blank" rel="noreferrer">GitHub repo</a>
       <a href="https://x.com/benra1sofian" target="_blank" rel="noreferrer">Benra1sofian on X</a>
