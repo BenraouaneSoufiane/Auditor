@@ -3,6 +3,21 @@
 ![Language](https://img.shields.io/badge/Python-99.8%25-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Basic arch
+### Tool discovery
+<img width="780" height="276" alt="image" src="https://github.com/user-attachments/assets/604c879b-c556-449f-9f58-7b4256bd638c" />
+
+### Payment handling
+<img width="1057" height="625" alt="image" src="https://github.com/user-attachments/assets/c0a38c30-413a-487b-bb68-64198c11209c" />
+
+### Execution internals (task execution)
+<img width="875" height="467" alt="image" src="https://github.com/user-attachments/assets/d4df9288-b59d-4e93-a50a-7da1234c97b0" />
+
+
+
+
+
+
 ## Overview
 
 **Auditor** is a sophisticated autonomous agent that:
