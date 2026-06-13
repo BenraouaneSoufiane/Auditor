@@ -1,0 +1,39 @@
+{"time": 1781284097.9053435, "event": "sap_tool_call", "tool": "auditor_launch", "arguments": {"page": 1, "page_size": 3, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60}}
+{"time": 1781284100.4965239, "event": "sap_payment_settled", "tool": "auditor_launch", "verifier": "http://127.0.0.1:8787/verify", "depositor_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj", "escrow_pda": "9rHAtirWYCYLkTbLA54Wxk54MqrCsb6Ck8JELvhNfWeF", "settlement_signature": "4Vv75EFq6vWutbB6B2FuKo4dUEJjRU7C4kmWJXq92MPYc4BQNyNmwqZJU1prggnWaTQVgfYWUCRmPY4dgdiVJi8j", "settlement_receipt": null, "already_settled": false}
+{"time": 1781284100.4990718, "event": "agent_loop_start", "page": 1, "page_size": 3, "max_files_per_task": 80, "audit_timeout_seconds": 60, "program_timeout_seconds": 60, "ccr_cmd": "claude -p --setting-sources project,local", "run_id": "run_6bc985ad519e4db2", "owner_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj"}
+{"time": 1781284101.0912025, "event": "programs_fetched", "count": 3}
+{"time": 1781284101.0915577, "event": "program_start", "program": "Clear Street Disclosure Program", "program_id": "HackerOne:clear_street_vdp"}
+{"time": 1781284101.2835715, "event": "targets_fetched", "program": "Clear Street Disclosure Program", "count": 1}
+{"time": 1781284101.2839153, "event": "target_selected", "program": "Clear Street Disclosure Program", "target": "Domain", "target_type": "domain", "identifier": "clearstreet.io", "kind": "domain"}
+{"time": 1781284101.2843945, "event": "target_audit_start", "program": "Clear Street Disclosure Program", "target": "Domain", "source": "clearstreet.io", "kind": "domain", "timeout_seconds": 60}
+{"time": 1781284101.285006, "event": "prompt_written", "target": "clearstreet.io", "prompt": "/root/auditor/work/prompt_Clear_Street_Disclosure_Program__Domain__domain.txt", "prompt_bytes": 2756, "kind": "domain"}
+{"time": 1781284101.2857015, "event": "llm_start", "label": "Clear_Street_Disclosure_Program__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2756, "timeout_seconds": 60}
+{"time": 1781284161.3575451, "event": "llm_timeout", "label": "Clear_Street_Disclosure_Program__Domain__domain:domain", "elapsed_seconds": 60.07, "timeout_seconds": 60}
+{"time": 1781284161.35895, "event": "timeout_fallback_report", "target": "clearstreet.io", "report": "/root/auditor/work/reports/Clear_Street_Disclosure_Program__Domain__domain.md", "timeout_seconds": 60}
+{"time": 1781284161.3596697, "event": "report_written", "target": "clearstreet.io", "report": "/root/auditor/work/reports/Clear_Street_Disclosure_Program__Domain__domain.md", "report_bytes": 659, "mode": "domain"}
+{"time": 1781284161.3602471, "event": "target_audit_done", "report_id": "report_1bb4c76e457d447e", "run_id": "run_6bc985ad519e4db2", "owner_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj", "kind": "domain", "program": "Clear Street Disclosure Program", "target": "Domain", "source": "clearstreet.io", "report": "/root/auditor/work/reports/Clear_Street_Disclosure_Program__Domain__domain.md", "finished_at": 1781284161.3599741}
+{"time": 1781284161.361879, "event": "program_start", "program": "Files.com", "program_id": "HackerOne:files"}
+{"time": 1781284161.5643737, "event": "targets_fetched", "program": "Files.com", "count": 14}
+{"time": 1781284161.5647202, "event": "target_selected", "program": "Files.com", "target": "Domain", "target_type": "domain", "identifier": "app.files.com", "kind": "domain"}
+{"time": 1781284161.565032, "event": "target_audit_start", "program": "Files.com", "target": "Domain", "source": "app.files.com", "kind": "domain", "timeout_seconds": 60}
+{"time": 1781284161.565656, "event": "prompt_written", "target": "app.files.com", "prompt": "/root/auditor/work/prompt_Files.com__Domain__domain.txt", "prompt_bytes": 3585, "kind": "domain"}
+{"time": 1781284161.566166, "event": "llm_start", "label": "Files.com__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 3585, "timeout_seconds": 60}
+{"time": 1781284221.6472003, "event": "llm_timeout", "label": "Files.com__Domain__domain:domain", "elapsed_seconds": 60.08, "timeout_seconds": 60}
+{"time": 1781284221.6484904, "event": "timeout_fallback_report", "target": "app.files.com", "report": "/root/auditor/work/reports/Files.com__Domain__domain.md", "timeout_seconds": 60}
+{"time": 1781284221.6491406, "event": "report_written", "target": "app.files.com", "report": "/root/auditor/work/reports/Files.com__Domain__domain.md", "report_bytes": 657, "mode": "domain"}
+{"time": 1781284221.6509094, "event": "target_audit_done", "report_id": "report_2d8bb7da79234613", "run_id": "run_6bc985ad519e4db2", "owner_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj", "kind": "domain", "program": "Files.com", "target": "Domain", "source": "app.files.com", "report": "/root/auditor/work/reports/Files.com__Domain__domain.md", "finished_at": 1781284221.6495261}
+{"time": 1781284221.6515238, "event": "program_timeout_skip", "program": "Files.com", "elapsed_seconds": 60.29, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1781284221.6517594, "event": "program_start", "program": "Weblate", "program_id": "HackerOne:weblate"}
+{"time": 1781284221.9116817, "event": "targets_fetched", "program": "Weblate", "count": 8}
+{"time": 1781284221.9128776, "event": "target_selected", "program": "Weblate", "target": "Domain", "target_type": "domain", "identifier": "hg.weblate.org", "kind": "domain"}
+{"time": 1781284221.914057, "event": "target_audit_start", "program": "Weblate", "target": "Domain", "source": "hg.weblate.org", "kind": "domain", "timeout_seconds": 60}
+{"time": 1781284221.9149399, "event": "prompt_written", "target": "hg.weblate.org", "prompt": "/root/auditor/work/prompt_Weblate__Domain__domain.txt", "prompt_bytes": 2735, "kind": "domain"}
+{"time": 1781284221.9165852, "event": "llm_start", "label": "Weblate__Domain__domain:domain", "cmd": "claude -p --setting-sources project,local", "cwd": "/root/auditor/work", "prompt_bytes": 2735, "timeout_seconds": 60}
+{"time": 1781284224.8234873, "event": "sap_tool_call", "tool": "auditor_stats", "arguments": {}}
+{"time": 1781284226.765616, "event": "sap_payment_settled", "tool": "auditor_stats", "verifier": "http://127.0.0.1:8787/verify", "depositor_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj", "escrow_pda": "9rHAtirWYCYLkTbLA54Wxk54MqrCsb6Ck8JELvhNfWeF", "settlement_signature": "2X3gJ5uu4dqvp4p4Syapbh1UaQJ57UY2gmXyJTWyH4aVjzeuniAgmB2cFSNgYw3jE2QsuJAPkSEqDWtK4TCTKbky", "settlement_receipt": null, "already_settled": false}
+{"time": 1781284281.9980202, "event": "llm_timeout", "label": "Weblate__Domain__domain:domain", "elapsed_seconds": 60.08, "timeout_seconds": 60}
+{"time": 1781284281.9985068, "event": "timeout_fallback_report", "target": "hg.weblate.org", "report": "/root/auditor/work/reports/Weblate__Domain__domain.md", "timeout_seconds": 60}
+{"time": 1781284281.9989154, "event": "report_written", "target": "hg.weblate.org", "report": "/root/auditor/work/reports/Weblate__Domain__domain.md", "report_bytes": 659, "mode": "domain"}
+{"time": 1781284282.0000656, "event": "target_audit_done", "report_id": "report_470d1eb26249468d", "run_id": "run_6bc985ad519e4db2", "owner_wallet": "ChFuq3jo53o1QutYhKqRsF1LpE27hxpeymGWxwE17MGj", "kind": "domain", "program": "Weblate", "target": "Domain", "source": "hg.weblate.org", "report": "/root/auditor/work/reports/Weblate__Domain__domain.md", "finished_at": 1781284281.9991562}
+{"time": 1781284282.0004275, "event": "program_timeout_skip", "program": "Weblate", "elapsed_seconds": 60.35, "timeout_seconds": 60, "remaining_targets": "not processed"}
+{"time": 1781284282.0007231, "event": "agent_loop_done", "report_count": 3, "error_count": 0, "skipped_count": 0, "stopped": false}

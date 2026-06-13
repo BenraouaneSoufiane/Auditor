@@ -1,0 +1,128 @@
+
+Do a QUICK bug bounty triage audit for this domain/subdomain target.
+You must finish quickly. Do not perform deep analysis. Do not use tools. Keep the report under 500 words.
+
+Target:
+app.files.com
+
+Program:
+{
+  "handle": "files",
+  "name": "Files.com",
+  "date_launched": "2017-02-21",
+  "profile_picture": "https://profile-photos.hackerone-user-content.com/variants/000/013/031/84b2c7ce7085dfe55cd17696fb6f6dba499dfa3c_original.png/89f037b490baf3dcca1b84283f4c85141b64c213252a9c79b56c62bf903ab542",
+  "platform": "HackerOne",
+  "link": "https://hackerone.com/files",
+  "report_count": 64,
+  "last_updated": "2026-06-12T17:03:12Z",
+  "targets_updated_at": "2026-06-05T20:48:55Z",
+  "bounty_min": 250,
+  "bounty_max": 10000,
+  "up_votes": 0,
+  "down_votes": 0,
+  "id": "HackerOne:files",
+  "added_at": "2017-02-21T00:00:00Z",
+  "extra_data": {
+    "report_count": 64,
+    "report_count_source": "reports_received_last_90_days",
+    "report_count_label": "reports received (last 90 days)"
+  },
+  "scope_tags": [
+    "domain",
+    "executable",
+    "other"
+  ],
+  "total_votes": 0,
+  "vote_ratio": 0.0,
+  "net_score": 0,
+  "star_rating": null,
+  "review_signal": 0.0,
+  "weighted_sentiment": 0.0,
+  "target_counts": {
+    "total": 14,
+    "in_scope": 10,
+    "out_of_scope": 4,
+    "eligible_for_bounty": 10,
+    "wildcard": 0
+  },
+  "target_activity": {
+    "latest_change_at": "2026-06-05T20:48:55Z",
+    "latest_added_at": "2026-06-05T20:48:55Z",
+    "added_24h": 0,
+    "added_7d": 1,
+    "removed_7d": 0
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from elevated public report count, older program, generic web scope."
+}
+
+Target metadata:
+{
+  "target_type": "domain",
+  "identifier": "app.files.com",
+  "display_name": "Domain",
+  "normalized_identifier": "app.files.com",
+  "in_scope": true,
+  "wildcard": false,
+  "scope_tags": [
+    "domain"
+  ],
+  "language_tags": [],
+  "metadata": {
+    "cvss_score": "critical"
+  },
+  "source_url": "https://hackerone.com/files/policy_scopes?type=team",
+  "added_at": "2026-05-07T12:58:00Z",
+  "source_added_at": null,
+  "last_seen": "2026-06-12T17:03:12Z",
+  "eligible_for_bounty": true,
+  "severity_score": null,
+  "severity_label": null,
+  "last_change_type": null,
+  "last_changed_at": null,
+  "is_active": true,
+  "targetOpportunityScore": 39,
+  "targetOpportunityLabel": "Normal",
+  "targetScoreBreakdown": {
+    "freshness": {
+      "score": 0,
+      "label": "Older than 30 days",
+      "days": 36.17
+    },
+    "targetType": {
+      "score": 14,
+      "label": "Web/domain",
+      "key": "domain"
+    },
+    "reward": {
+      "score": 22,
+      "label": "High bounty",
+      "maxBounty": 10000,
+      "isNoReward": false
+    },
+    "reportActivity": {
+      "score": 3,
+      "label": "Elevated public report count",
+      "reportCount": 64,
+      "fallback": null
+    }
+  },
+  "competitionRisk": "High",
+  "competitionRiskReason": "Estimated from elevated public report count, older program, generic web scope.",
+  "whyThisTarget": "Older web/domain target, with eligible and in scope, high bounty potential, high competition risk."
+}
+
+Return exactly this structure:
+# Quick Domain Audit: app.files.com
+
+## Verdict
+One of: No credible Critical/High from metadata | Needs Manual Review | Potential Critical/High hypothesis.
+
+## Top Attack Hypotheses
+At most 5 bullets. Each bullet must be one sentence and include the likely impact.
+
+## Fast Checks
+At most 5 concrete checks a human can run next.
+
+## Notes
+Only include uncertainty, scope caveats, or why no credible finding can be claimed from metadata.

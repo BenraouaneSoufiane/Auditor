@@ -39,10 +39,11 @@ else:
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env", override=True)
 WORKDIR = Path(os.getenv("WORKDIR", ROOT / "work")).resolve()
-DEFAULT_REGISTRATION = WORKDIR / "sap-registration.json"
 DEFAULT_RECEIPTS = WORKDIR / "caller_receipts.jsonl"
 PAYMENT_SCRIPT = ROOT / "scripts" / "sap-caller-payment.ts"
+RESOLVE_AGENT_SCRIPT = ROOT / "scripts" / "resolve-sap-agent.ts"
 DEFAULT_KEYPAIR = ROOT / ".sap-keypair-mainnet.json"
+DEFAULT_AGENT_ID = "6ZTMVhTK5i1dphmrdCHMgbtKhy9roPSsoesPEt9oPXRA"
 
 HOME_HTML = """<!doctype html>
 <html lang="en">
@@ -591,13 +592,12 @@ def launch_args_from_env() -> dict[str, int]:
 class CallerAgent:
     def __init__(self, args: argparse.Namespace) -> None:
         load_dotenv(ROOT / ".env", override=True)
-        self.registration_path = Path(args.registration).resolve()
-        self.registration = load_json_file(self.registration_path, {})
         self.receipts_path = Path(args.receipts).resolve()
-        self.base_url = self.resolve_base_url(args.base_url)
-        self.agent_wallet = args.agent_wallet or self.registration.get("wallet")
-        self.rpc_url = args.rpc_url or os.getenv("SAP_RPC_URL") or os.getenv("SYNAPSE_RPC_URL") or self.registration.get("rpcUrl")
+        self.rpc_url = args.rpc_url or os.getenv("SAP_RPC_URL") or os.getenv("SYNAPSE_RPC_URL")
         self.rpc_api_key = args.rpc_api_key or os.getenv("SAP_RPC_API_KEY") or os.getenv("SYNAPSE_API_KEY")
+        self.registration = self.resolve_onchain_registration()
+        self.base_url = self.resolve_base_url(args.base_url)
+        self.agent_wallet = self.registration.get("wallet")
         self.keypair_path = args.keypair or os.getenv("SAP_KEYPAIR_PATH") or os.getenv("ANCHOR_WALLET")
         self.network = args.network or os.getenv("SAP_PAYMENT_NETWORK") or "solana:mainnet-beta"
         self.price_per_call = str(args.price_per_call or os.getenv("SAP_PRICE_PER_CALL_LAMPORTS") or "50000000")
@@ -615,12 +615,47 @@ class CallerAgent:
         env_url = os.getenv("SAP_CALLER_BASE_URL") or os.getenv("AGENT_BASE_URL")
         if env_url:
             return env_url.rstrip("/")
-        return str(self.registration.get("agentBaseUrl") or "http://127.0.0.1:8000").rstrip("/")
+        if self.registration.get("agentBaseUrl"):
+            return str(self.registration["agentBaseUrl"]).rstrip("/")
+        for key in ("agentUri", "x402Endpoint"):
+            value = self.registration.get(key)
+            if value:
+                parsed = urlparse(str(value))
+                if parsed.scheme and parsed.netloc:
+                    return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+        return "http://127.0.0.1:8000"
+
+    def resolve_onchain_registration(self) -> dict[str, Any]:
+        if not self.rpc_url:
+            raise SystemExit("Missing SAP_RPC_URL or SYNAPSE_RPC_URL for SAP on-chain agent discovery.")
+
+        request = {
+            "rpcUrl": self.rpc_url,
+            "rpcApiKey": self.rpc_api_key,
+            "agentId": os.getenv("SAP_AGENT_ID") or DEFAULT_AGENT_ID,
+        }
+        env = os.environ.copy()
+        env["SAP_AGENT_DISCOVERY_REQUEST"] = json.dumps({key: value for key, value in request.items() if value})
+        completed = subprocess.run(
+            ["npx", "tsx", str(RESOLVE_AGENT_SCRIPT)],
+            cwd=ROOT,
+            env=env,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if completed.returncode != 0:
+            raise SystemExit(f"SAP on-chain discovery failed:\n{completed.stderr.strip() or completed.stdout.strip()}")
+        resolved = json.loads(completed.stdout)
+        if not isinstance(resolved, dict):
+            raise SystemExit("SAP on-chain discovery did not return a JSON object.")
+        return resolved
 
     def require_payment_config(self) -> None:
         missing = []
         if not self.agent_wallet:
-            missing.append("agent wallet (use --agent-wallet or work/sap-registration.json)")
+            missing.append("agent wallet from SAP on-chain discovery")
         if not self.rpc_url:
             missing.append("RPC URL (use --rpc-url or SAP_RPC_URL)")
         if not self.keypair_path:
@@ -1003,13 +1038,11 @@ def serve_home(caller: CallerAgent, host: str, port: int) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Paid SAP caller for the Auditor agent.")
-    parser.add_argument("--base-url", help="Agent base URL. Defaults to SAP_CALLER_BASE_URL, AGENT_BASE_URL, registration, then localhost.")
-    parser.add_argument("--registration", default=str(DEFAULT_REGISTRATION), help="Path to SAP registration JSON.")
+    parser.add_argument("--base-url", help="Override the agent base URL discovered from SAP/OOBE.")
     parser.add_argument("--receipts", default=str(DEFAULT_RECEIPTS), help="Path to caller receipt JSONL.")
     parser.add_argument("--keypair", help="Existing Solana keypair path for payment.")
     parser.add_argument("--rpc-url", help="Solana RPC URL.")
     parser.add_argument("--rpc-api-key", help="Optional RPC API key sent as x-api-key.")
-    parser.add_argument("--agent-wallet", help="Agent owner wallet; defaults to registration wallet.")
     parser.add_argument("--network", help="X-Payment network identifier.", default=None)
     parser.add_argument("--price-per-call", help="Lamports per tool call.")
     parser.add_argument("--min-escrow-deposit", help="Minimum escrow deposit lamports.")
